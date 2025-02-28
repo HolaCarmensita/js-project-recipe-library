@@ -12,6 +12,18 @@
   font-style: normal;
 }
 
-body {
-  font-family: 'FuturaCustom', 'Arial', sans-serif;
+:root {
+  --backgroud-color: #fafbff;
+  --text-color-blue: #0018a4;
+  --text-color-white: #fff;
+  --text-color-black: #000;
+
+  --button-color-blue: #0018a4;
+  --button-color-magenta: #ccffe2;
+
+  --button-color-light-pink: #ffecea;
+  --button-color-pink: #ff6589;
+
+  --border-color-blue: #0018a4;
+  --border-color-black: #000;
 }

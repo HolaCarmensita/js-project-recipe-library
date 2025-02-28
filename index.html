@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recipe Library</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
   </head>
   <body>
-    <header>
-      <h1>Uppstart</h1>
-    </header>
-    <main>
-      <button id="clickMe">Klicka mig!</button>
-      <p id="message"></p>
-    </main>
-    <script src="script.js" defer></script>
+    <div class="wrapper">
+      <header>
+        <h1 class="title">Recipe Library</h1>
+      </header>
+      <nav>
+        <div class="filters-container"></div>
+      </nav>
+
+      <main>
+        <div class="recipes-container"></div>
+      </main>
+    </div>
   </body>
 </html>
