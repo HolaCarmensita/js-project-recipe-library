@@ -7,14 +7,14 @@ const recipes = [
     cuisine: 'Italian',
     time: '20 min',
     ingredients: ['Spaghetti', 'Eggs', 'Bacon', 'Parmesan', 'Black pepper'],
-    image: 'carbonara.jpg',
+    image: 'assets/img/bread.jpeg',
   },
   {
     title: 'Sushi',
     cuisine: 'Japanese',
     time: '45 min',
     ingredients: ['Rice', 'Nori', 'Salmon', 'Avocado', 'Soy sauce'],
-    image: 'sushi.jpg',
+    image: 'assets/img/pommes.jpeg',
   },
 ];
 
@@ -41,22 +41,33 @@ function generateRecipeCards() {
     card.classList.add('recipe-card');
 
     card.innerHTML = `
+    <div class="img-container">
       <img src="${recipe.image}" alt="Bild på ${recipe.title}">
+      </div>
             <h2>${recipe.title}</h2>
+            <hr>
+            <div class="time-and-cuisine">
+            <div class="time">
             <h3>Time:</h3>
             <p>${recipe.time}</p>
+            </div>
+            <div class="cuisine">
             <h3>Cuisine:</h3>
             <p>${recipe.cuisine}</p>
+            </div>
+            </div>
+                        <hr>
+
+            <div class="ingredients">
             <h3>Ingredients:</h3>
             <ul>
                 ${recipe.ingredients.map((ing) => `<li>${ing}</li>`).join('')}
             </ul>
+            </div>
     `;
     recipesContainer.appendChild(card);
   });
 }
-
-generateRecipeCards();
 
 //Generera filter-knappar
 function generateFilterCards() {
@@ -86,7 +97,7 @@ function generateFilterCards() {
     //Steg 3 Skapar en knapp från vaerje item i item-listan
     filter.items.forEach((item) => {
       const button = document.createElement('button');
-      button.classList.add('time');
+      button.classList.add('filter-btn');
       button.textContent = item;
       buttonContainer.appendChild(button);
     });

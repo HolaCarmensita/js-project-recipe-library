@@ -40,6 +40,7 @@ h2::first-letter {
 
 body {
   font-family: 'FuturaCustom', 'Arial', sans-serif;
+  background-color: var(--backgroud-color);
 }
 
 .wrapper {
@@ -50,6 +51,10 @@ body {
 
 header {
   padding: 30px 0px 30px 0px;
+}
+
+ul {
+  list-style-type: none;
 }
 
 .title {
@@ -108,4 +113,79 @@ button {
 .filter-cooking_time button {
   background: var(--button-color-magenta);
   color: var(--text-color-blue);
+}
+
+.recipes-container {
+  padding: 40px 0 40px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.recipe-card {
+  display: flex;
+  width: 300px;
+  padding: 16px 16px 24px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+
+  border-radius: 16px;
+  border: 2px solid #0018a4;
+  background: #fff;
+  box-shadow: 0px 0px 30px 0px rgba(0, 24, 164, 0.2);
+}
+
+hr {
+  width: 100%;
+  border: none;
+  height: 1px;
+  background-color: #e9e9e9; /* Blå linje */
+}
+
+.img-container {
+  width: 100%;
+  height: 200px;
+  background-color: #000;
+  overflow: hidden;
+}
+
+img {
+  height: 100%;
+}
+
+.time-and-cuisine {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time,
+.cuisine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredients ul {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+}
+
+@media (min-width: 768px) {
+  .filters-container {
+    flex-direction: row;
+  }
+
+  .recipes-container {
+    flex-direction: row;
+  }
 }
