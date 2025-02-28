@@ -27,3 +27,85 @@
   --border-color-blue: #0018a4;
   --border-color-black: #000;
 }
+
+h2::first-letter {
+  text-transform: uppercase;
+}
+
+/* .dark-mode {
+    --bg-color: #121212;
+    --text-color: #f5f5f5;
+    --primary-color: #1E90FF;
+} */
+
+body {
+  font-family: 'FuturaCustom', 'Arial', sans-serif;
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto; /* Centrerar innehållet horisontellt */
+  padding: 20px;
+}
+
+header {
+  padding: 30px 0px 30px 0px;
+}
+
+.title {
+  color: #0018a4;
+  font-size: 40px;
+}
+
+.recipe-card {
+  border: #000 solid 1px;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-diets button:first-of-type {
+  background: var(--button-color-blue);
+  color: var(--text-color-white);
+}
+
+.filter-diets,
+.filter-cuisine,
+.filter-cooking_time {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  width: fit-content;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 50px;
+}
+
+.filter-cuisine button {
+  background: var(--button-color-light-pink);
+  color: var(--text-color-blue);
+}
+
+.filter-cuisine button:first-of-type {
+  background: var(--button-color-pink);
+  color: var(--text-color-white);
+}
+
+.filter-diets button,
+.filter-cooking_time button {
+  background: var(--button-color-magenta);
+  color: var(--text-color-blue);
+}
