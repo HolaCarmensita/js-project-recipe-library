@@ -78,11 +78,6 @@ ul {
   gap: 16px;
 }
 
-.filter-diets button:first-of-type {
-  background: var(--button-color-blue);
-  color: var(--text-color-white);
-}
-
 .filter-diets,
 .filter-cuisine,
 .filter-cooking_time {
@@ -92,11 +87,25 @@ ul {
 }
 
 button {
+  cursor: pointer;
   width: fit-content;
   border: none;
   padding: 8px 16px;
   font-size: 14px;
   border-radius: 50px;
+  border: 2px solid transparent;
+}
+
+.filter-diets button,
+.filter-cooking_time button {
+  background: var(--button-color-magenta);
+  color: var(--text-color-blue);
+}
+
+.filter-diets button.active,
+.filter-cooking_time button.active {
+  color: var(--text-color-white);
+  background-color: var(--button-color-blue);
 }
 
 .filter-cuisine button {
@@ -104,15 +113,9 @@ button {
   color: var(--text-color-blue);
 }
 
-.filter-cuisine button:first-of-type {
-  background: var(--button-color-pink);
+.filter-cuisine button.active {
+  background-color: var(--button-color-pink);
   color: var(--text-color-white);
-}
-
-.filter-diets button,
-.filter-cooking_time button {
-  background: var(--button-color-magenta);
-  color: var(--text-color-blue);
 }
 
 .recipes-container {
