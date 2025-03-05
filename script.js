@@ -178,69 +178,54 @@ const FILTERS = [
 ];
 
 //Generera filter-knappar
-const generateFilterButtons = () => {
-  //Skapa filter-card som parent
-  FILTERS.forEach((filter) => {
+const generateFilterButtons = (aArray) => {
+  aArray.forEach((filter) => {
     const card = document.createElement('div');
     card.classList.add(
       'filter-card',
       filter.category.toLowerCase().replace(/_/g, '-')
     );
 
-    // Skapa titel (h2) för kategorin
     const title = document.createElement('h2');
     title.textContent = filter.category.replace(/_/g, ' ');
-    //Lägger in titeln i filter-card
     card.appendChild(title);
 
-    //Steg 1 Skapar en ButtonContainer för knapparna med en klass baserad på kategorin!
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add(
       `filter-${filter.category.toLowerCase().replace(/_/g, '-')}`
     );
 
-    //Steg 2 Här vill vi ha en all-knapp i vår buttonContainer
     const allButton = document.createElement('button');
     allButton.classList.add('all');
     allButton.textContent = 'All';
     buttonContainer.appendChild(allButton);
 
-    //Steg 2,5 Eventlistner på buttonContainer, all-knappen och enskilda knappar.
     buttonContainer.addEventListener('click', (event) => {
       if (event.target.tagName === 'BUTTON') {
         if (event.target.classList.contains('all')) {
-          // Om "All"-knappen klickas, toggla alla knappar i buttonContainer
           const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
-          const isActive = event.target.classList.contains('active'); // Är "All" aktiv?
+          const isActive = event.target.classList.contains('active');
 
-          buttons.forEach((btn) => {
-            if (isActive) {
-              btn.classList.remove('active'); // Ta bort "active" om "All" redan är aktiv
-            } else {
-              btn.classList.add('active'); // Lägg till "active" annars
-            }
-          });
+          buttons.forEach((btn) =>
+            isActive
+              ? btn.classList.remove('active')
+              : btn.classList.add('active')
+          );
         } else {
-          // Om en vanlig knapp klickas, toggla bara den
           event.target.classList.toggle('active');
         }
         updateSelectedFiltersPTag();
       }
     });
 
-    //Steg 3 Skapar en knapp från vaerje item i item-listan
     filter.items.forEach((item) => {
       const button = document.createElement('button');
       button.classList.add('filter-btn');
       button.textContent = item;
-
-      //EventListner on click
       buttonContainer.appendChild(button);
     });
 
-    //Steg 4 Lägg in buttonContainer i filter Card.
     card.appendChild(buttonContainer);
-    //Läg in det nu kompletta kortet i den redan existerade filterContainer
     filtersContainer.appendChild(card);
   });
 };
@@ -298,5 +283,5 @@ const updateSelectedFiltersPTag = () => {
     : 'Valda filter: Inga';
 };
 
-generateFilterButtons();
+generateFilterButtons(FILTERS);
 generateRecipeCards();
