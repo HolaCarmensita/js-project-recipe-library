@@ -80,7 +80,8 @@ ul {
 
 .filter-diets,
 .filter-cuisine,
-.filter-cooking_time {
+.filter-cooking-time,
+.filter-amount-of-ingredients {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -97,23 +98,25 @@ button {
 }
 
 .filter-diets button,
-.filter-cooking_time button {
+.filter-cooking-time button {
   background: var(--button-color-magenta);
   color: var(--text-color-blue);
 }
 
 .filter-diets button.active,
-.filter-cooking_time button.active {
+.filter-cooking-time button.active {
   color: var(--text-color-white);
   background-color: var(--button-color-blue);
 }
 
-.filter-cuisine button {
+.filter-cuisine button,
+.filter-amount-of-ingredients button {
   background: var(--button-color-light-pink);
   color: var(--text-color-blue);
 }
 
-.filter-cuisine button.active {
+.filter-cuisine button.active,
+.filter-amount-of-ingredients button.active {
   background-color: var(--button-color-pink);
   color: var(--text-color-white);
 }
