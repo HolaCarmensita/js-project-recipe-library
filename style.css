@@ -150,8 +150,9 @@ hr {
   background-color: #e9e9e9; /* Blå linje */
 }
 
+/* IMG behöver göras om för att bli responsiv, vi tar det senare när vi har bilder */
 .img-container {
-  width: 100%;
+  width: 250px;
   height: 200px;
   background-color: #000;
   overflow: hidden;

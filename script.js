@@ -165,7 +165,6 @@ const FILTERS = [
     category: 'cooking_time',
     items: ['Under 15 min', '15-30 min', '30-60 min', 'Over 60 min'],
   },
-  ,
   {
     category: 'Amount_of_ingredients',
     items: [
@@ -214,7 +213,7 @@ const generateFilterButtons = (aArray) => {
         } else {
           event.target.classList.toggle('active');
         }
-        updateSelectedFiltersPTag();
+        filterRecipes();
       }
     });
 
@@ -231,10 +230,8 @@ const generateFilterButtons = (aArray) => {
 };
 
 //generera recipie-cards dynamiskt
-const generateRecipeCards = () => {
-  recipesContainer.innerHTML = ''; //resets the container before we load
-
-  RECIPES.forEach((recipe) => {
+const generateRecipeCards = (ARRAY) => {
+  ARRAY.forEach((recipe) => {
     const card = document.createElement('article');
     card.classList.add('recipe-card');
 
@@ -267,12 +264,8 @@ const generateRecipeCards = () => {
   });
 };
 
+// Funktion för att uppdatera p-taggen, valda filter (gjord av AI behöver gå igenom hur denna fungerar )
 const filterRecipes = () => {
-  /*Här ska vi filtrera som vi gjort i FilterPtag*/
-};
-
-//Funktion för att uppdatera p-taggen, valda filter (gjord av AI behöver gå igenom hur denna fungerar )
-const updateSelectedFiltersPTag = () => {
   const selectedFilters = document.querySelectorAll('.filter-btn.active');
 
   const allSelected = Array.from(selectedFilters).map((btn) => btn.textContent);
@@ -284,4 +277,6 @@ const updateSelectedFiltersPTag = () => {
 };
 
 generateFilterButtons(FILTERS);
-generateRecipeCards();
+generateRecipeCards(RECIPES);
+filterRecipes();
+// generateRecipeCards(RECIPES);
