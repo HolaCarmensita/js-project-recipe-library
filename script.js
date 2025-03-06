@@ -203,13 +203,8 @@ const generateFilterButtons = (aArray) => {
       if (event.target.tagName === 'BUTTON') {
         if (event.target.classList.contains('all')) {
           const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
-          const isActive = event.target.classList.contains('active');
-
-          buttons.forEach((btn) =>
-            isActive
-              ? btn.classList.remove('active')
-              : btn.classList.add('active')
-          );
+          // Om "All"-knappen klickas, TA BORT "active" från alla knappar i sin kategori
+          buttons.forEach((btn) => btn.classList.remove('active'));
         } else {
           event.target.classList.toggle('active');
         }
