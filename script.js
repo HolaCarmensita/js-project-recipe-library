@@ -262,8 +262,8 @@ const generateRecipeCards = (ARRAY) => {
 // Funktion för att uppdatera p-taggen, här ska filtreringen ske)
 const filterRecipes = () => {
   const selectedFilters = document.querySelectorAll('.filter-btn.active');
-  const SELECTED_FILTERS = Array.from(selectedFilters).map(
-    (btn) => btn.textContent
+  const SELECTED_FILTERS = Array.from(selectedFilters).map((btn) =>
+    btn.textContent.toLowerCase()
   );
 
   const filterValueContainer = document.getElementById('selected-filters');
@@ -277,11 +277,9 @@ const filterRecipes = () => {
     filteredRecipes = RECIPES;
   } else {
     //Filtrera en ny recipes-lista utifrån de valda filtervalen
-    filteredRecipes = RECIPES.filter((recipe) => {
-      return SELECTED_FILTERS.every((diet) =>
-        recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
-      );
-    });
+    filteredRecipes = RECIPES.filter((recipe) =>
+      SELECTED_FILTERS.every((diet) => recipe.diets.includes(diet))
+    );
   }
   if (filteredRecipes.length === 0) {
     console.log(SELECTED_FILTERS);

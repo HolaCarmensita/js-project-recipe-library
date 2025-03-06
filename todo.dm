@@ -8,9 +8,9 @@ Rensa och förstå koden (30 min)
 
 Implementera filtrering (60 min)
 
-[ ] Lägg till event listeners på filterknapparna.
+[X] Lägg till fungerande event listeners på filterknapparna.
 
-[ ] Uppdatera DOM:en dynamiskt när filter väljs.
+[-] Uppdatera DOM:en dynamiskt när filter väljs.
 
 
 
