@@ -178,7 +178,7 @@ const FILTERS = [
       'Under 5 ingredients',
       '6-10 ingredients',
       '11-15 ingredients',
-      'Over 16 ingredients',
+      'Over 15 ingredients',
     ],
   },
 ];
@@ -285,13 +285,28 @@ const filterRecipes = () => {
     filteredRecipes = RECIPES;
   } else {
     filteredRecipes = RECIPES.filter((recipe) => {
+      //filtrera Diets
       const matchesDiets = SELECTED_FILTERS.every((diet) =>
         recipe.diets.includes(diet)
       );
+
+      //Filtrera Cuisine
       const matchesCuisine = SELECTED_FILTERS.includes(
         recipe.cuisine.toLowerCase()
       );
-      return matchesDiets || matchesCuisine;
+
+      //Filtrera CookingTime: Kontrollera om Cooking Time matchar något valt filter
+      const matchesCookingTime = SELECTED_FILTERS.some((time) => {
+        if (time === 'under 15 min') return recipe.readyInMinutes < 15;
+        if (time === '15-30 min')
+          return recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30;
+        if (time === '30-60 min')
+          return recipe.readyInMinutes > 30 && recipe.readyInMinutes <= 60;
+        if (time === 'over 60 min') return recipe.readyInMinutes > 60;
+        return false; // Om inget matchar
+      });
+
+      return matchesDiets || matchesCuisine || matchesCookingTime;
     });
   }
   if (filteredRecipes.length === 0) {
