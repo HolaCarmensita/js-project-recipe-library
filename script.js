@@ -159,7 +159,14 @@ const FILTERS = [
   },
   {
     category: 'cuisine',
-    items: ['Mediterranean', 'Middle Eastern', 'Asian', 'Italian', 'Mexican'],
+    items: [
+      'Mediterranean',
+      'Middle Eastern',
+      'Asian',
+      'Italian',
+      'Mexican',
+      'European',
+    ],
   },
   {
     category: 'cooking_time',
@@ -273,16 +280,21 @@ const filterRecipes = () => {
 
   //Om SELECTED_FILTERS är tom ska alla RECIPES visas
   let filteredRecipes;
+
   if (SELECTED_FILTERS.length === 0) {
     filteredRecipes = RECIPES;
   } else {
-    //Filtrera en ny recipes-lista utifrån de valda filtervalen
-    filteredRecipes = RECIPES.filter((recipe) =>
-      SELECTED_FILTERS.every((diet) => recipe.diets.includes(diet))
-    );
+    filteredRecipes = RECIPES.filter((recipe) => {
+      const matchesDiets = SELECTED_FILTERS.every((diet) =>
+        recipe.diets.includes(diet)
+      );
+      const matchesCuisine = SELECTED_FILTERS.includes(
+        recipe.cuisine.toLowerCase()
+      );
+      return matchesDiets || matchesCuisine;
+    });
   }
   if (filteredRecipes.length === 0) {
-    console.log(SELECTED_FILTERS);
     recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
     return;
   }
