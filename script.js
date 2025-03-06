@@ -306,7 +306,25 @@ const filterRecipes = () => {
         return false; // Om inget matchar
       });
 
-      return matchesDiets || matchesCuisine || matchesCookingTime;
+      //Matcha antalet ingridienser
+      const matchesIngredients = SELECTED_FILTERS.some((amount) => {
+        const numIngredients = recipe.ingredients.length;
+
+        if (amount === 'under 5 ingredients') return numIngredients < 5;
+        if (amount === '6-10 ingredients')
+          return numIngredients >= 6 && numIngredients <= 10;
+        if (amount === '11-15 ingredients')
+          return numIngredients >= 11 && numIngredients <= 15;
+        if (amount === 'over 15 ingredients') return numIngredients > 15;
+        return false; // Om inget matchar
+      });
+
+      return (
+        matchesDiets ||
+        matchesCuisine ||
+        matchesCookingTime ||
+        matchesIngredients
+      );
     });
   }
   if (filteredRecipes.length === 0) {
