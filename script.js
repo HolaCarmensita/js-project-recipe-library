@@ -264,19 +264,41 @@ const generateRecipeCards = (ARRAY) => {
   });
 };
 
-// Funktion för att uppdatera p-taggen, valda filter (gjord av AI behöver gå igenom hur denna fungerar )
+// Funktion för att uppdatera p-taggen, här ska filtreringen ske)
 const filterRecipes = () => {
   const selectedFilters = document.querySelectorAll('.filter-btn.active');
+  const SELECTED_FILTERS = Array.from(selectedFilters).map(
+    (btn) => btn.textContent
+  );
 
-  const allSelected = Array.from(selectedFilters).map((btn) => btn.textContent);
-
-  const displayElement = document.getElementById('selected-filters');
-  displayElement.textContent = allSelected.length
-    ? `Valda filter: ${allSelected.join(', ')}`
+  const filterValueContainer = document.getElementById('selected-filters');
+  filterValueContainer.textContent = SELECTED_FILTERS.length
+    ? `Valda filter: ${SELECTED_FILTERS.join(', ')}`
     : 'Valda filter: Inga';
+
+  //Om SELECTED_FILTERS är tom ska alla RECIPES visas
+  let filteredRecipes;
+  if (SELECTED_FILTERS.length === 0) {
+    filteredRecipes = RECIPES;
+  } else {
+    //Filtrera en ny recipes-lista utifrån de valda filtervalen
+    filteredRecipes = RECIPES.filter((recipe) => {
+      return SELECTED_FILTERS.every((diet) =>
+        recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
+      );
+    });
+  }
+  if (filteredRecipes.length === 0) {
+    console.log(SELECTED_FILTERS);
+    recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
+    return;
+  }
+
+  //Rensa och uppdatera DOM:en med filtrerade recept
+  recipesContainer.innerHTML = '';
+  generateRecipeCards(filteredRecipes);
 };
 
 generateFilterButtons(FILTERS);
-generateRecipeCards(RECIPES);
 filterRecipes();
 // generateRecipeCards(RECIPES);
