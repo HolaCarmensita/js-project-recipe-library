@@ -210,23 +210,23 @@ const generateFilterButtons = (aArray) => {
     buttonContainer.addEventListener('click', (event) => {
       if (event.target.tagName === 'BUTTON') {
         const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
-        const allButton = buttonContainer.querySelector('.all'); // 🔥 Hämta "All"-knappen
-        const filterButtons = buttonContainer.querySelectorAll('.filter-btn'); // 🔥 Hämta alla filterknappar
+        const allButton = buttonContainer.querySelector('.all'); // Hämta "All"-knappen
+        const filterButtons = buttonContainer.querySelectorAll('.filter-btn'); // Hämta alla filterknappar
 
         if (event.target.classList.contains('all')) {
           const isActive = event.target.classList.contains('active');
 
           buttons.forEach((btn) => {
             if (isActive) {
-              btn.classList.remove('active'); // 🔥 Om "All" redan är aktiv → Avmarkera allt
+              btn.classList.remove('active'); // Om "All" redan är aktiv → Avmarkera allt
             } else {
-              btn.classList.add('active'); // 🔥 Om "All" inte är aktiv → Markera alla
+              btn.classList.add('active'); // Om "All" inte är aktiv → Markera alla
             }
           });
         } else {
-          event.target.classList.toggle('active'); // 🔥 Toggla enskilda knappar
+          event.target.classList.toggle('active'); // Toggla enskilda knappar
 
-          // ✅ Om alla filterknappar är aktiva → aktivera "All"
+          //Om alla filterknappar är aktiva → aktivera "All"
           const allSelected = [...filterButtons].every((btn) =>
             btn.classList.contains('active')
           );
@@ -238,7 +238,7 @@ const generateFilterButtons = (aArray) => {
           }
         }
 
-        filterRecipes(); // 🔥 Uppdatera filtreringen
+        filterRecipes(); // Uppdatera filtreringen
       }
     });
 
@@ -301,8 +301,9 @@ const presentSelectedFilters = (selectedFilterArray) => {
     : 'Valda filter: Inga';
 };
 
-// Funktion för att uppdatera p-taggen och filtrering
+//FILTRERING!!!!!
 const filterRecipes = () => {
+  recipesContainer.innerHTML = '';
   const selectedFilters = document.querySelectorAll(
     '.filter-btn.active, .all.active'
   );
@@ -312,73 +313,96 @@ const filterRecipes = () => {
 
   presentSelectedFilters(SELECTED_FILTERS);
 
-  console.log('Valda filter:', SELECTED_FILTERS); //se att "all" kommer med
+  console.log('📌 Valda filter:', SELECTED_FILTERS);
 
-  //Om SELECTED_FILTERS är tom ska alla RECIPES visas
   let filteredRecipes;
 
+  // Om inga filter är valda → Visa alla recept
   if (SELECTED_FILTERS.length === 0) {
+    console.log('✅ Inga filter valda, visar alla recept!');
     filteredRecipes = [...RECIPES];
   } else {
+    console.log('🔍 Börjar filtrera recept...');
+
     filteredRecipes = [...RECIPES].filter((recipe) => {
-      // Kolla om "All" är vald i Diets
+      console.log('🔎 Kollar recept:', recipe.title);
+      console.log('👀 Diets i receptet:', recipe.diets);
+      console.log('👀 Cuisine i receptet:', recipe.cuisine.toLowerCase());
+
       const isAllSelected = SELECTED_FILTERS.includes('all');
+      if (isAllSelected) {
+        console.log("✅ 'All' är vald, visar alla recept");
+        return true;
+      }
 
-      // Om "All" är vald → Visa alla recept
-      if (isAllSelected) return true;
-
-      // Annars filtrera på valda diets
-      const matchesDiets = SELECTED_FILTERS.some((diet) =>
-        recipe.diets.includes(diet)
+      // 🔥 Steg 1: Skapa separata listor för diets och cuisine
+      const selectedDiets = SELECTED_FILTERS.filter((filter) =>
+        RECIPES.some((recipe) => recipe.diets.includes(filter))
       );
 
-      //Filtrera Cuisine
-      const matchesCuisine = SELECTED_FILTERS.includes(
-        recipe.cuisine.toLowerCase()
+      const selectedCuisines = SELECTED_FILTERS.filter((filter) =>
+        RECIPES.some((recipe) => recipe.cuisine.toLowerCase() === filter)
       );
 
-      //Filtrera CookingTime: Kontrollera om Cooking Time matchar något valt filter
-      const matchesCookingTime = SELECTED_FILTERS.some((time) => {
-        if (time === 'under 15 min') return recipe.readyInMinutes < 15;
-        if (time === '15-30 min')
-          return recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30;
-        if (time === '30-60 min')
-          return recipe.readyInMinutes > 30 && recipe.readyInMinutes <= 60;
-        if (time === 'over 60 min') return recipe.readyInMinutes > 60;
-        return false; // Om inget matchar
-      });
+      console.log('📌 Valda Diets:', selectedDiets);
+      console.log('📌 Valda Cuisines:', selectedCuisines);
 
-      //Matcha antalet ingridienser
-      const matchesIngredients = SELECTED_FILTERS.some((amount) => {
-        const numIngredients = recipe.ingredients.length;
+      // 🔥 Steg 2: Kolla om receptet matchar filtren
+      const matchesDiets =
+        selectedDiets.length === 0 ||
+        selectedDiets.every((diet) => recipe.diets.includes(diet));
 
-        if (amount === 'under 5 ingredients') return numIngredients < 5;
-        if (amount === '6-10 ingredients')
-          return numIngredients >= 6 && numIngredients <= 10;
-        if (amount === '11-15 ingredients')
-          return numIngredients >= 11 && numIngredients <= 15;
-        if (amount === 'over 15 ingredients') return numIngredients > 15;
-        return false; // Om inget matchar
-      });
+      const matchesCuisine =
+        selectedCuisines.length === 0 ||
+        selectedCuisines.includes(recipe.cuisine.toLowerCase());
 
-      return (
-        matchesDiets ||
-        matchesCuisine ||
-        matchesCookingTime ||
-        matchesIngredients
-      );
+      console.log('✔ Matchar Diets?', matchesDiets);
+      console.log('✔ Matchar Cuisine?', matchesCuisine);
+
+      // 🔥 Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
+      const result = matchesDiets && matchesCuisine;
+
+      console.log('🔥 Returnerar', result);
+      return result;
     });
-  }
-  if (filteredRecipes.length === 0) {
-    recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
-    return;
+
+    console.log('📌 Efter filtrering, filteredRecipes:', filteredRecipes);
+
+    if (!filteredRecipes || filteredRecipes.length === 0) {
+      console.log('❌ Inga recept matchar filtren!');
+      recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
+      return;
+    }
   }
 
-  //Rensa och uppdatera DOM:en med filtrerade recept
-  recipesContainer.innerHTML = '';
+  // Uppdatera DOM:en med filtrerade recept
+
   generateRecipeCards(filteredRecipes);
 };
 
 generateFilterButtons(FILTERS);
 filterRecipes();
 // generateRecipeCards(RECIPES);
+
+// Filtrera på Cooking Time
+// const matchesCookingTime = SELECTED_FILTERS.some((time) => {
+//   if (time === 'under 15 min') return recipe.readyInMinutes < 15;
+//   if (time === '15-30 min')
+//     return recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30;
+//   if (time === '30-60 min')
+//     return recipe.readyInMinutes > 30 && recipe.readyInMinutes <= 60;
+//   if (time === 'over 60 min') return recipe.readyInMinutes > 60;
+//   return false;
+// });
+
+// Filtrera på antalet ingredienser
+// const matchesIngredients = SELECTED_FILTERS.some((amount) => {
+//   const numIngredients = recipe.ingredients.length;
+//   if (amount === 'under 5 ingredients') return numIngredients < 5;
+//   if (amount === '6-10 ingredients')
+//     return numIngredients >= 6 && numIngredients <= 10;
+//   if (amount === '11-15 ingredients')
+//     return numIngredients >= 11 && numIngredients <= 15;
+//   if (amount === 'over 15 ingredients') return numIngredients > 15;
+//   return false;
+// });
