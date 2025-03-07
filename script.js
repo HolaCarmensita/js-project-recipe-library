@@ -1,6 +1,7 @@
 const recipesContainer = document.querySelector('.recipes-container');
 const filtersContainer = document.querySelector('.filters-container');
 const sortSelect = document.getElementById('sort-select');
+const supriseButton = document.getElementById('random-recipe-btn');
 
 const RECIPES = [
   {
@@ -414,10 +415,47 @@ const sortVisibleRecipes = () => {
 };
 
 // 🔹 6. Lägg till eventListener på sorteringsdropdown
-sortSelect.addEventListener('change', sortVisibleRecipes);
 
-generateFilterButtons(FILTERS);
-filterRecipes();
+const getRandomRecipe = () => {
+  if (RECIPES.length === 0) {
+    recipesContainer.innerHTML =
+      '<p>Hoppsan! Vi hittade inget roligt recept idag...</p>';
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * RECIPES.length);
+  const randomRecipe = RECIPES[randomIndex];
+
+  console.log('🎲 Random Recipe Selected:', randomRecipe); // Debugging
+
+  // Clear the container and display only the random recipe
+  recipesContainer.innerHTML = '';
+  generateRecipeCards([randomRecipe]);
+};
+
+const initEventListeners = () => {
+  sortSelect.addEventListener('change', sortVisibleRecipes);
+
+  supriseButton.addEventListener('click', getRandomRecipe);
+};
+
+const initApp = () => {
+  //generera filterknappar
+  generateFilterButtons(FILTERS);
+
+  //Visar alla recept vid start
+  filterRecipes();
+
+  //Sorteringsknapp
+  sortSelect.addEventListener('change', sortVisibleRecipes);
+
+  //SupriseMeKnapp
+  supriseButton.addEventListener('click', getRandomRecipe);
+};
+
+//Initiera hela appen när sidan laddas
+document.addEventListener('DOMContentLoaded', initApp);
+
 // generateRecipeCards(RECIPES);
 
 // Filtrera på Cooking Time
