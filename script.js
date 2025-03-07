@@ -218,24 +218,24 @@ const generateFilterButtons = (aArray) => {
 
           buttons.forEach((btn) => {
             if (isActive) {
-              btn.classList.remove('active'); // Om "All" redan är aktiv → Avmarkera allt
+              btn.classList.add('active'); // Om "All" redan är aktiv → Avmarkera allt
             } else {
-              btn.classList.add('active'); // Om "All" inte är aktiv → Markera alla
+              btn.classList.remove('active'); // Om "All" inte är aktiv → Markera alla
             }
           });
         } else {
           event.target.classList.toggle('active'); // Toggla enskilda knappar
 
           //Om alla filterknappar är aktiva → aktivera "All"
-          const allSelected = [...filterButtons].every((btn) =>
-            btn.classList.contains('active')
-          );
+          // const allSelected = [...filterButtons].every((btn) =>
+          //   btn.classList.contains('active')
+          // );
 
-          if (allSelected) {
-            allButton.classList.add('active');
-          } else {
-            allButton.classList.remove('active');
-          }
+          // if (allSelected) {
+          //   allButton.classList.remove('active');
+          // } else {
+          //   allButton.classList.add('active');
+          // }
         }
 
         filterRecipes(); // Uppdatera filtreringen
