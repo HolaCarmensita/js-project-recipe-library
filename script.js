@@ -201,6 +201,7 @@ const generateFilterButtons = (aArray) => {
       `filter-${filter.category.toLowerCase().replace(/_/g, '-')}`
     );
 
+    //Skapar all knappen med klassen all
     const allButton = document.createElement('button');
     allButton.classList.add('all');
     allButton.textContent = 'All';
@@ -208,14 +209,36 @@ const generateFilterButtons = (aArray) => {
 
     buttonContainer.addEventListener('click', (event) => {
       if (event.target.tagName === 'BUTTON') {
+        const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
+        const allButton = buttonContainer.querySelector('.all'); // 🔥 Hämta "All"-knappen
+        const filterButtons = buttonContainer.querySelectorAll('.filter-btn'); // 🔥 Hämta alla filterknappar
+
         if (event.target.classList.contains('all')) {
-          const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
-          // Om "All"-knappen klickas, TA BORT "active" från alla knappar i sin kategori
-          buttons.forEach((btn) => btn.classList.toggle('active'));
+          const isActive = event.target.classList.contains('active');
+
+          buttons.forEach((btn) => {
+            if (isActive) {
+              btn.classList.remove('active'); // 🔥 Om "All" redan är aktiv → Avmarkera allt
+            } else {
+              btn.classList.add('active'); // 🔥 Om "All" inte är aktiv → Markera alla
+            }
+          });
         } else {
-          event.target.classList.toggle('active');
+          event.target.classList.toggle('active'); // 🔥 Toggla enskilda knappar
+
+          // ✅ Om alla filterknappar är aktiva → aktivera "All"
+          const allSelected = [...filterButtons].every((btn) =>
+            btn.classList.contains('active')
+          );
+
+          if (allSelected) {
+            allButton.classList.add('active');
+          } else {
+            allButton.classList.remove('active');
+          }
         }
-        filterRecipes();
+
+        filterRecipes(); // 🔥 Uppdatera filtreringen
       }
     });
 
@@ -266,27 +289,46 @@ const generateRecipeCards = (ARRAY) => {
   });
 };
 
-// Funktion för att uppdatera p-taggen, här ska filtreringen ske)
+const presentSelectedFilters = (selectedFilterArray) => {
+  const filterValueContainer = document.getElementById('selected-filters');
+
+  const filteredArray = selectedFilterArray.filter(
+    (filter) => filter !== 'all'
+  );
+
+  filterValueContainer.textContent = filteredArray.length
+    ? `Valda filter: ${filteredArray.join(', ')}`
+    : 'Valda filter: Inga';
+};
+
+// Funktion för att uppdatera p-taggen och filtrering
 const filterRecipes = () => {
-  const selectedFilters = document.querySelectorAll('.filter-btn.active');
+  const selectedFilters = document.querySelectorAll(
+    '.filter-btn.active, .all.active'
+  );
   const SELECTED_FILTERS = Array.from(selectedFilters).map((btn) =>
     btn.textContent.toLowerCase()
   );
 
-  const filterValueContainer = document.getElementById('selected-filters');
-  filterValueContainer.textContent = SELECTED_FILTERS.length
-    ? `Valda filter: ${SELECTED_FILTERS.join(', ')}`
-    : 'Valda filter: Inga';
+  presentSelectedFilters(SELECTED_FILTERS);
+
+  console.log('Valda filter:', SELECTED_FILTERS); //se att "all" kommer med
 
   //Om SELECTED_FILTERS är tom ska alla RECIPES visas
   let filteredRecipes;
 
   if (SELECTED_FILTERS.length === 0) {
-    filteredRecipes = RECIPES;
+    filteredRecipes = [...RECIPES];
   } else {
-    filteredRecipes = RECIPES.filter((recipe) => {
-      //filtrera Diets
-      const matchesDiets = SELECTED_FILTERS.every((diet) =>
+    filteredRecipes = [...RECIPES].filter((recipe) => {
+      // Kolla om "All" är vald i Diets
+      const isAllSelected = SELECTED_FILTERS.includes('all');
+
+      // Om "All" är vald → Visa alla recept
+      if (isAllSelected) return true;
+
+      // Annars filtrera på valda diets
+      const matchesDiets = SELECTED_FILTERS.some((diet) =>
         recipe.diets.includes(diet)
       );
 

@@ -6,7 +6,7 @@
 }
 
 @font-face {
-  font-family: 'FuturaCustom';
+  font-family: Futura;
   src: url('fonts/futura.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
@@ -39,7 +39,7 @@ h2::first-letter {
 } */
 
 body {
-  font-family: 'FuturaCustom', 'Arial', sans-serif;
+  font-family: Futura, 'Arial', sans-serif;
   background-color: var(--backgroud-color);
 }
 
