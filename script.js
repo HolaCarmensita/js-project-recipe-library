@@ -1,5 +1,6 @@
 const recipesContainer = document.querySelector('.recipes-container');
 const filtersContainer = document.querySelector('.filters-container');
+const sortSelect = document.getElementById('sort-select');
 
 const RECIPES = [
   {
@@ -301,7 +302,7 @@ const presentSelectedFilters = (selectedFilterArray) => {
     : 'Valda filter: Inga';
 };
 
-//FILTRERING!!!!!
+//FILTRERING!!!!! AI har hjälpt mig, behöver lära mig detta, gå ingenom varje steg.
 const filterRecipes = () => {
   recipesContainer.innerHTML = '';
   const selectedFilters = document.querySelectorAll(
@@ -376,9 +377,44 @@ const filterRecipes = () => {
   }
 
   // Uppdatera DOM:en med filtrerade recept
+  generateRecipeCards(filteredRecipes);
 
+  //Sortering uppdateras vid ny filtrering
+  sortVisibleRecipes();
+};
+
+const sortVisibleRecipes = () => {
+  const recipeCards = Array.from(document.querySelectorAll('.recipe-card'));
+
+  if (recipeCards.length === 0) return; // Om inga kort finns, gör ingenting
+
+  // 🔹 1. Hämta alla titlar från synliga receptkort
+  const visibleTitles = recipeCards.map((card) =>
+    card.querySelector('h2').textContent.trim()
+  );
+
+  // 🔹 2. Filtrera ut rätt recept från RECIPES baserat på titlarna
+  let filteredRecipes = RECIPES.filter((recipe) =>
+    visibleTitles.includes(recipe.title)
+  );
+
+  // 🔹 3. Hämta sorteringsval
+  const sortOrder = sortSelect.value;
+
+  // 🔹 4. Sortera recepten beroende på användarens val
+  if (sortOrder === 'longest') {
+    filteredRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes);
+  } else if (sortOrder === 'shortest') {
+    filteredRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+  }
+
+  // 🔹 5. Generera kort med den sorterade listan
+  recipesContainer.innerHTML = '';
   generateRecipeCards(filteredRecipes);
 };
+
+// 🔹 6. Lägg till eventListener på sorteringsdropdown
+sortSelect.addEventListener('change', sortVisibleRecipes);
 
 generateFilterButtons(FILTERS);
 filterRecipes();
