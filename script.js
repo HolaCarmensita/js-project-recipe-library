@@ -433,12 +433,6 @@ const getRandomRecipe = () => {
   generateRecipeCards([randomRecipe]);
 };
 
-const initEventListeners = () => {
-  sortSelect.addEventListener('change', sortVisibleRecipes);
-
-  supriseButton.addEventListener('click', getRandomRecipe);
-};
-
 const initApp = () => {
   //generera filterknappar
   generateFilterButtons(FILTERS);
