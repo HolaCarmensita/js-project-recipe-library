@@ -450,6 +450,60 @@ const initApp = () => {
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
 
+const includedCuisines = [
+  'italian',
+  'mediterranean',
+  'middle eastern',
+  'asian',
+  'mexican',
+  'european',
+];
+const excludedCuisines = [
+  'African',
+  'American',
+  'British',
+  'Cajun',
+  'Caribbean',
+  'Chinese',
+  'Eastern European',
+  'French',
+  'German',
+  'Greek',
+  'Indian',
+  'Irish',
+  'Japanese',
+  'Jewish',
+  'Korean',
+  'Latin American',
+  'Nordic',
+  'Southern',
+  'Spanish',
+  'Thai',
+  'Vietnamese',
+];
+const includedDiets = ['Vegan|Vegetarian|Gluten Free|Dairy Free|[]'];
+
+const excludedDiets = [
+  'Ketogenic',
+  'Lacto-Vegetarian',
+  'Ovo-Vegetarian',
+  'Pescetarian',
+  'Paleo',
+  'Primal',
+  'Low FODMAP',
+  'Whole30',
+];
+
+const API_KEY = '649bf6cc7ba345bba9a1a0cabc1c7c65';
+const url = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${API_KEY}&number=10&cuisine=${includedCuisines}&diet=${includedDiets}&addRecipeInformation=true`;
+
+fetch(url)
+  .then((response) => response.json())
+  .then((data) => {
+    console.log('Filtered Recipes:', data.results);
+  })
+  .catch((error) => console.error('Error fetching recipes:', error));
+
 // generateRecipeCards(RECIPES);
 
 // Filtrera på Cooking Time
