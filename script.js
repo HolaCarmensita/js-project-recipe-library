@@ -450,14 +450,8 @@ const initApp = () => {
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
 
-const includedCuisines = [
-  'italian',
-  'mediterranean',
-  'middle eastern',
-  'asian',
-  'mexican',
-  'european',
-];
+const includedCuisines =
+  'italian,mediterranean,middle eastern,asian,mexican,european';
 const excludedCuisines = [
   'African',
   'American',
@@ -481,28 +475,64 @@ const excludedCuisines = [
   'Thai',
   'Vietnamese',
 ];
-const includedDiets = ['Vegan|Vegetarian|Gluten Free|Dairy Free|[]'];
-
-const excludedDiets = [
-  'Ketogenic',
-  'Lacto-Vegetarian',
-  'Ovo-Vegetarian',
-  'Pescetarian',
-  'Paleo',
-  'Primal',
-  'Low FODMAP',
-  'Whole30',
-];
-
+const searchEndPoint = 'https://api.spoonacular.com/recipes/complexSearch';
+const bulkEndPoint = 'https://api.spoonacular.com/recipes/informationBulk';
 const API_KEY = '649bf6cc7ba345bba9a1a0cabc1c7c65';
-const url = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${API_KEY}&number=10&cuisine=${includedCuisines}&diet=${includedDiets}&addRecipeInformation=true`;
 
-fetch(url)
-  .then((response) => response.json())
-  .then((data) => {
-    console.log('Filtered Recipes:', data.results);
-  })
-  .catch((error) => console.error('Error fetching recipes:', error));
+const fetchRecipes = async () => {
+  try {
+    const url = `${searchEndPoint}?apiKey=${API_KEY}&number=10&cuisine=${includedCuisines}`;
+    console.log('Fetching recipes from:', url);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.results || data.results.length === 0) {
+      throw new Error('No recipes found for the given cuisines.');
+    }
+
+    console.log('Result from complexSearch:', data.results);
+
+    const recipeIds = data.results.map((recipe) => recipe.id).join(',');
+    console.log('recipe ids', recipeIds);
+    return fetchRecipeDetails(recipeIds);
+  } catch (error) {
+    console.error('Error fetching recipes:', error.message);
+    return [];
+  }
+};
+
+//Need to fetch again to get ingridiets... with bulk, dont find any other way....
+const fetchRecipeDetails = async (recipeIds) => {
+  try {
+    const url = `${bulkEndPoint}?apiKey=${API_KEY}&ids=${recipeIds}`;
+    console.log('Fetching detailed recipe data from:', url);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Detailed Recipes:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching recipe details:', error.message);
+    return [];
+  }
+};
+
+fetchRecipes();
+
+// fetch(url)
+//   .then((response) => response.json())
+//   .then((data) => {
+//     console.log('Filtered Recipes:', data.results);
+//   })
+//   .catch((error) => console.error('Error fetching recipes:', error));
 
 // generateRecipeCards(RECIPES);
 
