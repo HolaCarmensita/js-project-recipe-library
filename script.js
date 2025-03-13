@@ -2,6 +2,34 @@ const recipesContainer = document.querySelector('.recipes-container');
 const filtersContainer = document.querySelector('.filters-container');
 const sortSelect = document.getElementById('sort-select');
 const supriseButton = document.getElementById('random-recipe-btn');
+const includedCuisines =
+  'italian,mediterranean,middle eastern,asian,mexican,european';
+const excludedCuisines = [
+  'African',
+  'American',
+  'British',
+  'Cajun',
+  'Caribbean',
+  'Chinese',
+  'Eastern European',
+  'French',
+  'German',
+  'Greek',
+  'Indian',
+  'Irish',
+  'Japanese',
+  'Jewish',
+  'Korean',
+  'Latin American',
+  'Nordic',
+  'Southern',
+  'Spanish',
+  'Thai',
+  'Vietnamese',
+];
+const searchEndPoint = 'https://api.spoonacular.com/recipes/complexSearch';
+const bulkEndPoint = 'https://api.spoonacular.com/recipes/informationBulk';
+const API_KEY = '649bf6cc7ba345bba9a1a0cabc1c7c65';
 
 const RECIPES = [
   {
@@ -227,17 +255,6 @@ const generateFilterButtons = (aArray) => {
           });
         } else {
           event.target.classList.toggle('active'); // Toggla enskilda knappar
-
-          //Om alla filterknappar är aktiva → aktivera "All"
-          // const allSelected = [...filterButtons].every((btn) =>
-          //   btn.classList.contains('active')
-          // );
-
-          // if (allSelected) {
-          //   allButton.classList.remove('active');
-          // } else {
-          //   allButton.classList.add('active');
-          // }
         }
 
         filterRecipes(); // Uppdatera filtreringen
@@ -414,7 +431,7 @@ const sortVisibleRecipes = () => {
   generateRecipeCards(filteredRecipes);
 };
 
-// 🔹 6. Lägg till eventListener på sorteringsdropdown
+//Lägg till eventListener på sorteringsdropdown
 
 const getRandomRecipe = () => {
   if (RECIPES.length === 0) {
@@ -450,35 +467,7 @@ const initApp = () => {
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
 
-const includedCuisines =
-  'italian,mediterranean,middle eastern,asian,mexican,european';
-const excludedCuisines = [
-  'African',
-  'American',
-  'British',
-  'Cajun',
-  'Caribbean',
-  'Chinese',
-  'Eastern European',
-  'French',
-  'German',
-  'Greek',
-  'Indian',
-  'Irish',
-  'Japanese',
-  'Jewish',
-  'Korean',
-  'Latin American',
-  'Nordic',
-  'Southern',
-  'Spanish',
-  'Thai',
-  'Vietnamese',
-];
-const searchEndPoint = 'https://api.spoonacular.com/recipes/complexSearch';
-const bulkEndPoint = 'https://api.spoonacular.com/recipes/informationBulk';
-const API_KEY = '649bf6cc7ba345bba9a1a0cabc1c7c65';
-
+//Fetch fron ComplexSearch to get recipies with specific Cuisines
 const fetchRecipes = async () => {
   try {
     const url = `${searchEndPoint}?apiKey=${API_KEY}&number=10&cuisine=${includedCuisines}`;
@@ -526,35 +515,3 @@ const fetchRecipeDetails = async (recipeIds) => {
 };
 
 fetchRecipes();
-
-// fetch(url)
-//   .then((response) => response.json())
-//   .then((data) => {
-//     console.log('Filtered Recipes:', data.results);
-//   })
-//   .catch((error) => console.error('Error fetching recipes:', error));
-
-// generateRecipeCards(RECIPES);
-
-// Filtrera på Cooking Time
-// const matchesCookingTime = SELECTED_FILTERS.some((time) => {
-//   if (time === 'under 15 min') return recipe.readyInMinutes < 15;
-//   if (time === '15-30 min')
-//     return recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30;
-//   if (time === '30-60 min')
-//     return recipe.readyInMinutes > 30 && recipe.readyInMinutes <= 60;
-//   if (time === 'over 60 min') return recipe.readyInMinutes > 60;
-//   return false;
-// });
-
-// Filtrera på antalet ingredienser
-// const matchesIngredients = SELECTED_FILTERS.some((amount) => {
-//   const numIngredients = recipe.ingredients.length;
-//   if (amount === 'under 5 ingredients') return numIngredients < 5;
-//   if (amount === '6-10 ingredients')
-//     return numIngredients >= 6 && numIngredients <= 10;
-//   if (amount === '11-15 ingredients')
-//     return numIngredients >= 11 && numIngredients <= 15;
-//   if (amount === 'over 15 ingredients') return numIngredients > 15;
-//   return false;
-// });
