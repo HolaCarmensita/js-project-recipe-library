@@ -219,18 +219,19 @@ const FILTERS = [
 const generateFilterButtons = (aArray) => {
   aArray.forEach((filter) => {
     //Filterknappar utom All-knappen
-    const card = document.createElement('div');
-    card.classList.add(
-      'filter-card',
+    const filtersContainerChild = document.createElement('div');
+    filtersContainerChild.classList.add(
+      'filter-container-child',
       filter.category.toLowerCase().replace(/_/g, '-')
     );
 
     const title = document.createElement('h2');
     title.textContent = filter.category.replace(/_/g, ' ');
-    card.appendChild(title);
+    filtersContainerChild.appendChild(title);
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add(
+      `button-container`,
       `filter-${filter.category.toLowerCase().replace(/_/g, '-')}`
     );
 
@@ -240,32 +241,6 @@ const generateFilterButtons = (aArray) => {
     allButton.textContent = 'All';
     buttonContainer.appendChild(allButton);
 
-    // Lägg till en eventlyssnare på hela container för att fånga klick på både "all"-knappen och de övriga filterknapparna
-    buttonContainer.addEventListener('click', (event) => {
-      // Kontrollera att klicket verkligen kommer från en knapp
-      if (event.target.tagName === 'BUTTON') {
-        const clickedButton = event.target;
-        const filterButtons = buttonContainer.querySelectorAll('.filter-btn'); // Alla filterknappar
-
-        if (clickedButton.classList.contains('all')) {
-          // Om "All"-knappen klickas:
-          if (!clickedButton.classList.contains('active')) {
-            // Om den INTE är aktiv - lägg till "active" på sig själv och alla filter-knappar
-            clickedButton.classList.add('active');
-            filterButtons.forEach((btn) => btn.classList.add('active'));
-          } else {
-            // Om den redan är aktiv - ta bort "active" från sig själv och alla filter-knappar
-            clickedButton.classList.remove('active');
-            filterButtons.forEach((btn) => btn.classList.remove('active'));
-          }
-        } else {
-          // Om det är en vanlig filter-knapp: toggla dess "active"-klass
-          clickedButton.classList.toggle('active');
-        }
-      }
-      filterRecipes();
-    });
-
     filter.items.forEach((item) => {
       const button = document.createElement('button');
       button.classList.add('filter-btn');
@@ -273,10 +248,38 @@ const generateFilterButtons = (aArray) => {
       buttonContainer.appendChild(button);
     });
 
-    card.appendChild(buttonContainer);
-    filtersContainer.appendChild(card);
+    filtersContainerChild.appendChild(buttonContainer);
+    filtersContainer.appendChild(filtersContainerChild);
   });
 };
+
+// Eventlyssnare på hela filtersContainer
+filtersContainer.addEventListener('click', (event) => {
+  if (event.target.tagName === 'BUTTON') {
+    const clickedButton = event.target;
+
+    // Om det är "All"-knappen
+    if (clickedButton.classList.contains('all')) {
+      const filterContainer = clickedButton.parentElement;
+      const filterButtons = filterContainer.querySelectorAll('.filter-btn');
+
+      if (!clickedButton.classList.contains('active')) {
+        // Lägg till "active" på All-knappen och alla filterknappar
+        clickedButton.classList.add('active');
+        filterButtons.forEach((btn) => btn.classList.add('active'));
+      } else {
+        // Ta bort "active" från All-knappen och alla filterknappar
+        clickedButton.classList.remove('active');
+        filterButtons.forEach((btn) => btn.classList.remove('active'));
+      }
+    } else {
+      // Toggla active-klassen för en enskild filter-knapp
+      clickedButton.classList.toggle('active');
+    }
+    // Efter att klasserna ändrats, anropa filterRecipes för att uppdatera receptlistan
+    filterRecipes();
+  }
+});
 
 //generera recipie-cards dynamiskt
 const generateRecipeCards = (ARRAY) => {
