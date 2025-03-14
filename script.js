@@ -1,8 +1,39 @@
 const recipesContainer = document.querySelector('.recipes-container');
 const filtersContainer = document.querySelector('.filters-container');
 const sortSelect = document.getElementById('sort-select');
-const supriseButton = document.getElementById('random-recipe-btn');
+const surpriseButton = document.getElementById('random-recipe-btn');
+const includedCuisines =
+  'italian,mediterranean,middle eastern,asian,mexican,european';
+const includedDiets = ['vegan', 'vegetarian', 'gluten free', 'dairy free'];
+const excludedCuisines = [
+  'African',
+  'American',
+  'British',
+  'Cajun',
+  'Caribbean',
+  'Chinese',
+  'Eastern European',
+  'French',
+  'German',
+  'Greek',
+  'Indian',
+  'Irish',
+  'Japanese',
+  'Jewish',
+  'Korean',
+  'Latin American',
+  'Nordic',
+  'Southern',
+  'Spanish',
+  'Thai',
+  'Vietnamese',
+];
+const searchEndPoint = 'https://api.spoonacular.com/recipes/complexSearch';
+const bulkEndPoint = 'https://api.spoonacular.com/recipes/informationBulk';
+const API_KEY = '11dcc7d2bf36478dae1c29d5a48bbc42';
 
+let visibleRecipes = [];
+let allRecipes = [];
 const RECIPES = [
   {
     id: 1,
@@ -157,7 +188,7 @@ const RECIPES = [
 const FILTERS = [
   {
     category: 'diets',
-    items: ['Vegan', 'Vegetarian', 'Gluten-free', 'Dairy-free'],
+    items: ['vegan', 'vegetarian', 'gluten free', 'dairy free'],
   },
   {
     category: 'cuisine',
@@ -170,79 +201,47 @@ const FILTERS = [
       'European',
     ],
   },
-  {
-    category: 'cooking_time',
-    items: ['Under 15 min', '15-30 min', '30-60 min', 'Over 60 min'],
-  },
-  {
-    category: 'Amount_of_ingredients',
-    items: [
-      'Under 5 ingredients',
-      '6-10 ingredients',
-      '11-15 ingredients',
-      'Over 15 ingredients',
-    ],
-  },
+  // {
+  //   category: 'cooking_time',
+  //   items: ['Under 15 min', '15-30 min', '30-60 min', 'Over 60 min'],
+  // },
+  // {
+  //   category: 'Amount_of_ingredients',
+  //   items: [
+  //     'Under 5 ingredients',
+  //     '6-10 ingredients',
+  //     '11-15 ingredients',
+  //     'Over 15 ingredients',
+  //   ],
+  // },
 ];
 
 //Generera filter-knappar
 const generateFilterButtons = (aArray) => {
+  console.log('generateFilterButtons körs');
   aArray.forEach((filter) => {
-    const card = document.createElement('div');
-    card.classList.add(
-      'filter-card',
+    //Filterknappar utom All-knappen
+    const filtersContainerChild = document.createElement('div');
+    filtersContainerChild.classList.add(
+      'filter-container-child',
       filter.category.toLowerCase().replace(/_/g, '-')
     );
 
     const title = document.createElement('h2');
     title.textContent = filter.category.replace(/_/g, ' ');
-    card.appendChild(title);
+    filtersContainerChild.appendChild(title);
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add(
+      `button-container`,
       `filter-${filter.category.toLowerCase().replace(/_/g, '-')}`
     );
 
-    //Skapar all knappen med klassen all
+    // Skapar "All"-knappen
     const allButton = document.createElement('button');
     allButton.classList.add('all');
     allButton.textContent = 'All';
     buttonContainer.appendChild(allButton);
-
-    buttonContainer.addEventListener('click', (event) => {
-      if (event.target.tagName === 'BUTTON') {
-        const buttons = buttonContainer.querySelectorAll('.filter-btn, .all');
-        const allButton = buttonContainer.querySelector('.all'); // Hämta "All"-knappen
-        const filterButtons = buttonContainer.querySelectorAll('.filter-btn'); // Hämta alla filterknappar
-
-        if (event.target.classList.contains('all')) {
-          const isActive = event.target.classList.contains('active');
-
-          buttons.forEach((btn) => {
-            if (isActive) {
-              btn.classList.add('active'); // Om "All" redan är aktiv → Avmarkera allt
-            } else {
-              btn.classList.remove('active'); // Om "All" inte är aktiv → Markera alla
-            }
-          });
-        } else {
-          event.target.classList.toggle('active'); // Toggla enskilda knappar
-
-          //Om alla filterknappar är aktiva → aktivera "All"
-          // const allSelected = [...filterButtons].every((btn) =>
-          //   btn.classList.contains('active')
-          // );
-
-          // if (allSelected) {
-          //   allButton.classList.remove('active');
-          // } else {
-          //   allButton.classList.add('active');
-          // }
-        }
-
-        filterRecipes(); // Uppdatera filtreringen
-      }
-    });
 
     filter.items.forEach((item) => {
       const button = document.createElement('button');
@@ -251,20 +250,21 @@ const generateFilterButtons = (aArray) => {
       buttonContainer.appendChild(button);
     });
 
-    card.appendChild(buttonContainer);
-    filtersContainer.appendChild(card);
+    filtersContainerChild.appendChild(buttonContainer);
+    filtersContainer.appendChild(filtersContainerChild);
   });
 };
 
 //generera recipie-cards dynamiskt
 const generateRecipeCards = (ARRAY) => {
+  console.log('generateRecipeCards körs');
   ARRAY.forEach((recipe) => {
     const card = document.createElement('article');
     card.classList.add('recipe-card');
 
     card.innerHTML = `
     <div class="img-container">
-      <img src="${recipe.sourceUrl}" alt="Bild på ${recipe.title}">
+      <img src="${recipe.image}" alt="Bild på ${recipe.title}">
       </div>
             <h2>${recipe.title}</h2>
             <hr>
@@ -275,7 +275,17 @@ const generateRecipeCards = (ARRAY) => {
             </div>
             <div class="cuisine">
             <h3>Cuisine:</h3>
-            <p>${recipe.cuisine}</p>
+            <p>${recipe.cuisines
+              .filter((cuisine) =>
+                includedCuisines.includes(cuisine.toLowerCase())
+              )
+              .join(', ')}</p>
+            </div>
+             <div class="Diets">
+            <h3>Diets:</h3>
+            <p>${recipe.diets
+              .filter((diet) => includedDiets.includes(diet.toLowerCase()))
+              .join(', ')}</p>
             </div>
             </div>
                         <hr>
@@ -283,7 +293,9 @@ const generateRecipeCards = (ARRAY) => {
             <div class="ingredients">
             <h3>Ingredients:</h3>
             <ul>
-                ${recipe.ingredients.map((ing) => `<li>${ing}</li>`).join('')}
+              ${recipe.extendedIngredients
+                .map((ing) => `<li>${ing.name}</li>`)
+                .join('')}
             </ul>
             </div>
     `;
@@ -303,174 +315,241 @@ const presentSelectedFilters = (selectedFilterArray) => {
     : 'Valda filter: Inga';
 };
 
-//FILTRERING!!!!! AI har hjälpt mig, behöver lära mig detta, gå ingenom varje steg.
+//Filtrering av filterknappar
 const filterRecipes = () => {
-  recipesContainer.innerHTML = '';
-  const selectedFilters = document.querySelectorAll(
-    '.filter-btn.active, .all.active'
-  );
-  const SELECTED_FILTERS = Array.from(selectedFilters).map((btn) =>
-    btn.textContent.toLowerCase()
-  );
+  const selectedFilters = Array.from(
+    document.querySelectorAll('.filter-btn.active, .all.active')
+  ).map((btn) => btn.textContent.toLowerCase());
 
-  presentSelectedFilters(SELECTED_FILTERS);
-
-  console.log('📌 Valda filter:', SELECTED_FILTERS);
+  presentSelectedFilters(selectedFilters);
 
   let filteredRecipes;
-
   // Om inga filter är valda → Visa alla recept
-  if (SELECTED_FILTERS.length === 0) {
-    console.log('✅ Inga filter valda, visar alla recept!');
-    filteredRecipes = [...RECIPES];
+  if (selectedFilters.length === 0) {
+    filteredRecipes = [...allRecipes];
   } else {
-    console.log('🔍 Börjar filtrera recept...');
-
-    filteredRecipes = [...RECIPES].filter((recipe) => {
-      console.log('🔎 Kollar recept:', recipe.title);
-      console.log('👀 Diets i receptet:', recipe.diets);
-      console.log('👀 Cuisine i receptet:', recipe.cuisine.toLowerCase());
-
-      const isAllSelected = SELECTED_FILTERS.includes('all');
-      if (isAllSelected) {
-        console.log("✅ 'All' är vald, visar alla recept");
+    filteredRecipes = [...allRecipes].filter((recipe) => {
+      // Om "all" är valt returnera alla recept
+      if (selectedFilters.includes('all')) {
         return true;
       }
 
-      // 🔥 Steg 1: Skapa separata listor för diets och cuisine
-      const selectedDiets = SELECTED_FILTERS.filter((filter) =>
-        RECIPES.some((recipe) => recipe.diets.includes(filter))
+      // Skapa listor med de valda dieterna respektive cuisines, baserat på våra referenslistor
+      const selectedDiets = selectedFilters.filter((filter) =>
+        includedDiets.includes(filter)
+      );
+      const selectedCuisines = selectedFilters.filter((filter) =>
+        includedCuisines.includes(filter)
       );
 
-      const selectedCuisines = SELECTED_FILTERS.filter((filter) =>
-        RECIPES.some((recipe) => recipe.cuisine.toLowerCase() === filter)
+      // Om receptet har en 'diets'-lista: omvandla alla värden till gemener
+      const recipeDiets = recipe.diets.map((diet) => diet.toLowerCase());
+      // Om receptet har en 'cuisines'-lista: omvandla alla värden till gemener
+      const recipeCuisines = recipe.cuisines.map((cuisine) =>
+        cuisine.toLowerCase()
       );
 
-      console.log('📌 Valda Diets:', selectedDiets);
-      console.log('📌 Valda Cuisines:', selectedCuisines);
-
-      // 🔥 Steg 2: Kolla om receptet matchar filtren
+      // Kontrollera om receptet matchar filtren
       const matchesDiets =
         selectedDiets.length === 0 ||
-        selectedDiets.every((diet) => recipe.diets.includes(diet));
+        selectedDiets.every((diet) =>
+          recipeDiets.map((d) => d.toLowerCase()).includes(diet)
+        );
 
       const matchesCuisine =
         selectedCuisines.length === 0 ||
-        selectedCuisines.includes(recipe.cuisine.toLowerCase());
+        selectedCuisines.includes(recipeCuisines.toLowerCase());
 
-      console.log('✔ Matchar Diets?', matchesDiets);
-      console.log('✔ Matchar Cuisine?', matchesCuisine);
-
-      // 🔥 Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
-      const result = matchesDiets && matchesCuisine;
-
-      console.log('🔥 Returnerar', result);
-      return result;
+      // Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
+      return matchesDiets && matchesCuisine;
     });
-
-    console.log('📌 Efter filtrering, filteredRecipes:', filteredRecipes);
-
-    if (!filteredRecipes || filteredRecipes.length === 0) {
-      console.log('❌ Inga recept matchar filtren!');
-      recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
-      return;
-    }
   }
 
-  // Uppdatera DOM:en med filtrerade recept
-  generateRecipeCards(filteredRecipes);
-
-  //Sortering uppdateras vid ny filtrering
-  sortVisibleRecipes();
+  // Uppdatera state-variabeln
+  visibleRecipes = filteredRecipes;
+  console.log('filteredRecipes resultat:', filteredRecipes);
+  return filteredRecipes;
 };
 
 const sortVisibleRecipes = () => {
-  const recipeCards = Array.from(document.querySelectorAll('.recipe-card'));
+  console.log('sortVisibleRecipes körs');
 
-  if (recipeCards.length === 0) return; // Om inga kort finns, gör ingenting
+  if (visibleRecipes.length === 0) return; // Om inga kort finns, gör ingenting
 
-  // 🔹 1. Hämta alla titlar från synliga receptkort
-  const visibleTitles = recipeCards.map((card) =>
-    card.querySelector('h2').textContent.trim()
-  );
-
-  // 🔹 2. Filtrera ut rätt recept från RECIPES baserat på titlarna
-  let filteredRecipes = RECIPES.filter((recipe) =>
-    visibleTitles.includes(recipe.title)
-  );
-
-  // 🔹 3. Hämta sorteringsval
+  //Hämta sorteringsval från vår selector
   const sortOrder = sortSelect.value;
 
-  // 🔹 4. Sortera recepten beroende på användarens val
+  let sortedRecipes = [...visibleRecipes];
+
+  //Sortera recepten beroende på användarens val
   if (sortOrder === 'longest') {
-    filteredRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes);
+    sortedRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes);
   } else if (sortOrder === 'shortest') {
-    filteredRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+    sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+  } else if (sortOrder === 'none') {
+    // Om 'none' är valt, gör ingen sortering – listan förblir oförändrad
   }
 
-  // 🔹 5. Generera kort med den sorterade listan
+  //rensa container och generera nya kort på den sorterade listan
   recipesContainer.innerHTML = '';
-  generateRecipeCards(filteredRecipes);
+  generateRecipeCards(sortedRecipes);
 };
 
-// 🔹 6. Lägg till eventListener på sorteringsdropdown
-
 const getRandomRecipe = () => {
-  if (RECIPES.length === 0) {
+  console.log('getRandomRecipe');
+
+  if (allRecipes.length === 0) {
     recipesContainer.innerHTML =
       '<p>Hoppsan! Vi hittade inget roligt recept idag...</p>';
     return;
   }
 
-  const randomIndex = Math.floor(Math.random() * RECIPES.length);
-  const randomRecipe = RECIPES[randomIndex];
+  const randomIndex = Math.floor(Math.random() * allRecipes.length);
+  const randomRecipe = allRecipes[randomIndex];
 
-  console.log('🎲 Random Recipe Selected:', randomRecipe); // Debugging
+  console.log('Random Recipe Selected:', randomRecipe); // Debugging
 
   // Clear the container and display only the random recipe
   recipesContainer.innerHTML = '';
   generateRecipeCards([randomRecipe]);
 };
 
-const initApp = () => {
-  //generera filterknappar
+const updateRecipesUI = () => {
+  // Rensa container
+  recipesContainer.innerHTML = '';
+
+  // Om inga recept finns, visa ett meddelande
+  if (!visibleRecipes || visibleRecipes.length === 0) {
+    recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
+    return;
+  }
+
+  // Generera receptkort med de filtrerade recepten
+  generateRecipeCards(visibleRecipes);
+};
+
+//En renderingsfunktion (sortering ligger här)
+const renderRecipes = () => {
+  // Hämta sorteringsvalet
+  const sortOrder = sortSelect.value;
+  let recipesToRender = [...visibleRecipes]; // Arbeta med en kopia
+
+  // Applicera sortering baserat på sortOrder
+  if (sortOrder === 'longest') {
+    recipesToRender.sort((a, b) => b.readyInMinutes - a.readyInMinutes);
+  } else if (sortOrder === 'shortest') {
+    recipesToRender.sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+  }
+  // Om "none" är valt, lämnas listan oförändrad
+
+  // Rensa containern
+  recipesContainer.innerHTML = '';
+
+  // Rendera recepten eller visa ett meddelande om listan är tom
+  if (recipesToRender.length === 0) {
+    recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
+  } else {
+    generateRecipeCards(recipesToRender);
+  }
+};
+
+//
+const initApp = async () => {
   generateFilterButtons(FILTERS);
 
-  //Visar alla recept vid start
-  filterRecipes();
+  const cachedData = localStorage.getItem('allRecipes');
+  if (cachedData) {
+    allRecipes = JSON.parse(cachedData);
+  } else {
+    allRecipes = await fetchRecipes();
+    localStorage.setItem('allRecipes', JSON.stringify(allRecipes));
+  }
+  visibleRecipes = [...allRecipes];
 
-  //Sorteringsknapp
-  sortSelect.addEventListener('change', sortVisibleRecipes);
+  renderRecipes();
 
-  //SupriseMeKnapp
-  supriseButton.addEventListener('click', getRandomRecipe);
+  // Eventlyssnare filtersContainer
+  filtersContainer.addEventListener('click', (event) => {
+    if (event.target.tagName === 'BUTTON') {
+      const clickedButton = event.target;
+      // Hantera toggling av "active"-klassen för "all" och individuella filter
+      if (clickedButton.classList.contains('all')) {
+        const filterContainer = clickedButton.parentElement;
+        const filterButtons = filterContainer.querySelectorAll('.filter-btn');
+        if (!clickedButton.classList.contains('active')) {
+          clickedButton.classList.add('active');
+          filterButtons.forEach((btn) => btn.classList.add('active'));
+        } else {
+          clickedButton.classList.remove('active');
+          filterButtons.forEach((btn) => btn.classList.remove('active'));
+        }
+      } else {
+        clickedButton.classList.toggle('active');
+      }
+      // Uppdatera state
+      visibleRecipes = filterRecipes();
+      // Anropa renderingsfunktion
+      renderRecipes();
+    }
+  });
+
+  sortSelect.addEventListener('change', () => {
+    renderRecipes();
+  });
+
+  surpriseButton.addEventListener('click', getRandomRecipe);
 };
+
+document.addEventListener('DOMContentLoaded', initApp);
+
+//Fetch fron ComplexSearch with the Bulkfetch from fetchRecipieDetails to get recipies with specific Cuisines
+const fetchRecipes = async () => {
+  try {
+    const url = `${searchEndPoint}?apiKey=${API_KEY}&number=30&cuisine=${includedCuisines}`;
+    console.log('Fetching recipes from:', url);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.results || data.results.length === 0) {
+      throw new Error('No recipes found for the given cuisines.');
+    }
+
+    console.log('Result from complexSearch:', data.results);
+
+    const recipeIds = data.results.map((recipe) => recipe.id).join(',');
+    console.log('recipe ids', recipeIds);
+    return fetchRecipeDetails(recipeIds);
+  } catch (error) {
+    console.error('Error fetching recipes:', error.message);
+    return [];
+  }
+};
+
+//Need to fetch again to get ingridiets... with bulk, dont find any other way....
+const fetchRecipeDetails = async (recipeIds) => {
+  try {
+    const url = `${bulkEndPoint}?apiKey=${API_KEY}&ids=${recipeIds}`;
+    console.log('Fetching detailed recipe data from:', url);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Detailed recipe data:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching recipe details:', error.message);
+    return [];
+  }
+};
+
+fetchRecipes();
 
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
-
-// generateRecipeCards(RECIPES);
-
-// Filtrera på Cooking Time
-// const matchesCookingTime = SELECTED_FILTERS.some((time) => {
-//   if (time === 'under 15 min') return recipe.readyInMinutes < 15;
-//   if (time === '15-30 min')
-//     return recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30;
-//   if (time === '30-60 min')
-//     return recipe.readyInMinutes > 30 && recipe.readyInMinutes <= 60;
-//   if (time === 'over 60 min') return recipe.readyInMinutes > 60;
-//   return false;
-// });
-
-// Filtrera på antalet ingredienser
-// const matchesIngredients = SELECTED_FILTERS.some((amount) => {
-//   const numIngredients = recipe.ingredients.length;
-//   if (amount === 'under 5 ingredients') return numIngredients < 5;
-//   if (amount === '6-10 ingredients')
-//     return numIngredients >= 6 && numIngredients <= 10;
-//   if (amount === '11-15 ingredients')
-//     return numIngredients >= 11 && numIngredients <= 15;
-//   if (amount === 'over 15 ingredients') return numIngredients > 15;
-//   return false;
-// });
