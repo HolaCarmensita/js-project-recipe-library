@@ -95,6 +95,7 @@ button {
   font-size: 14px;
   border-radius: 50px;
   border: 2px solid transparent;
+  text-transform: capitalize;
 }
 
 .filter-diets button,
