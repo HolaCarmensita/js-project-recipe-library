@@ -188,7 +188,7 @@ const RECIPES = [
 const FILTERS = [
   {
     category: 'diets',
-    items: ['Vegan', 'Vegetarian', 'Gluten-free', 'Dairy-free'],
+    items: ['Vegan', 'Vegetarian', 'Gluten free', 'Dairy free'],
   },
   {
     category: 'cuisine',
@@ -323,43 +323,42 @@ const filterRecipes = () => {
 
   presentSelectedFilters(selectedFilters);
 
-  console.log('📌 filterRecipes körs:', selectedFilters);
-
   let filteredRecipes;
   // Om inga filter är valda → Visa alla recept
   if (selectedFilters.length === 0) {
     filteredRecipes = [...allRecipes];
   } else {
     filteredRecipes = [...allRecipes].filter((recipe) => {
-      const isAllSelected = selectedFilters.includes('all');
-      if (isAllSelected) {
+      // Om "all" är valt returnera alla recept
+      if (selectedFilters.includes('all')) {
         return true;
       }
 
-      // Steg 1: Skapa separata listor för diets och cuisine
+      // Skapa listor med de valda dieterna respektive cuisines, baserat på våra referenslistor
       const selectedDiets = selectedFilters.filter((filter) =>
-        allRecipes.some((recipe) => recipe.diets.includes(filter))
+        includedDiets.includes(filter)
+      );
+      const selectedCuisines = selectedFilters.filter((filter) =>
+        includedCuisines.includes(filter)
       );
 
-      // ÄR DET HÄR VERKLIGEN RÄTT??? Det är ju en lista itirerar jag verkligen?
-      const selectedCuisines = selectedFilters.filter((filter) =>
-        allRecipes.some(
-          (recipe) =>
-            recipe.cuisines &&
-            recipe.cuisines.some((cuisine) => cuisine.toLowerCase() === filter)
-        )
+      // Om receptet har en 'diets'-lista: omvandla alla värden till gemener
+      const recipeDiets = recipe.diets.map((diet) => diet.toLowerCase());
+      // Om receptet har en 'cuisines'-lista: omvandla alla värden till gemener
+      const recipeCuisines = recipe.cuisines.map((cuisine) =>
+        cuisine.toLowerCase()
       );
 
       // Kontrollera om receptet matchar filtren
       const matchesDiets =
         selectedDiets.length === 0 ||
         selectedDiets.every((diet) =>
-          recipe.diets.map((d) => d.toLowerCase()).includes(diet)
+          recipeDiets.map((d) => d.toLowerCase()).includes(diet)
         );
 
       const matchesCuisine =
         selectedCuisines.length === 0 ||
-        selectedCuisines.includes(recipe.cuisine.toLowerCase());
+        selectedCuisines.includes(recipeCuisines.toLowerCase());
 
       // Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
       return matchesDiets && matchesCuisine;
