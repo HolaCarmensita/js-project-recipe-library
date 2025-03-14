@@ -32,7 +32,7 @@ const bulkEndPoint = 'https://api.spoonacular.com/recipes/informationBulk';
 const API_KEY = '11dcc7d2bf36478dae1c29d5a48bbc42';
 
 let visibleRecipes = [];
-
+let allRecipes = [];
 const RECIPES = [
   {
     id: 1,
@@ -263,7 +263,7 @@ const generateRecipeCards = (ARRAY) => {
 
     card.innerHTML = `
     <div class="img-container">
-      <img src="${recipe.sourceUrl}" alt="Bild på ${recipe.title}">
+      <img src="${recipe.image}" alt="Bild på ${recipe.title}">
       </div>
             <h2>${recipe.title}</h2>
             <hr>
@@ -282,7 +282,9 @@ const generateRecipeCards = (ARRAY) => {
             <div class="ingredients">
             <h3>Ingredients:</h3>
             <ul>
-                ${recipe.ingredients.map((ing) => `<li>${ing}</li>`).join('')}
+              ${recipe.extendedIngredients
+                .map((ing) => `<li>${ing.name}</li>`)
+                .join('')}
             </ul>
             </div>
     `;
@@ -315,9 +317,9 @@ const filterRecipes = () => {
   let filteredRecipes;
   // Om inga filter är valda → Visa alla recept
   if (selectedFilters.length === 0) {
-    filteredRecipes = [...RECIPES];
+    filteredRecipes = [...allRecipes];
   } else {
-    filteredRecipes = [...RECIPES].filter((recipe) => {
+    filteredRecipes = [...allRecipes].filter((recipe) => {
       const isAllSelected = selectedFilters.includes('all');
       if (isAllSelected) {
         return true;
@@ -325,11 +327,11 @@ const filterRecipes = () => {
 
       // Steg 1: Skapa separata listor för diets och cuisine
       const selectedDiets = selectedFilters.filter((filter) =>
-        RECIPES.some((recipe) => recipe.diets.includes(filter))
+        allRecipes.some((recipe) => recipe.diets.includes(filter))
       );
 
       const selectedCuisines = selectedFilters.filter((filter) =>
-        RECIPES.some((recipe) => recipe.cuisine.toLowerCase() === filter)
+        allRecipes.some((recipe) => recipe.cuisine.toLowerCase() === filter)
       );
 
       // Kontrollera om receptet matchar filtren
@@ -381,16 +383,16 @@ const sortVisibleRecipes = () => {
 const getRandomRecipe = () => {
   console.log('getRandomRecipe');
 
-  if (RECIPES.length === 0) {
+  if (allRecipes.length === 0) {
     recipesContainer.innerHTML =
       '<p>Hoppsan! Vi hittade inget roligt recept idag...</p>';
     return;
   }
 
-  const randomIndex = Math.floor(Math.random() * RECIPES.length);
-  const randomRecipe = RECIPES[randomIndex];
+  const randomIndex = Math.floor(Math.random() * allRecipes.length);
+  const randomRecipe = allRecipes[randomIndex];
 
-  console.log('🎲 Random Recipe Selected:', randomRecipe); // Debugging
+  console.log('Random Recipe Selected:', randomRecipe); // Debugging
 
   // Clear the container and display only the random recipe
   recipesContainer.innerHTML = '';
@@ -437,9 +439,18 @@ const renderRecipes = () => {
 };
 
 //
-const initApp = () => {
+const initApp = async () => {
   generateFilterButtons(FILTERS);
-  visibleRecipes = filterRecipes(); // Inga filter aktiva = alla recept
+
+  const cachedData = localStorage.getItem('allRecipes');
+  if (cachedData) {
+    allRecipes = JSON.parse(cachedData);
+  } else {
+    allRecipes = await fetchRecipes();
+    localStorage.setItem('allRecipes', JSON.stringify(allRecipes));
+  }
+  visibleRecipes = [...allRecipes];
+
   renderRecipes();
 
   // Eventlyssnare filtersContainer
@@ -515,6 +526,7 @@ const fetchRecipeDetails = async (recipeIds) => {
     }
 
     const data = await response.json();
+    console.log('Detailed recipe data:', data);
     return data;
   } catch (error) {
     console.error('Error fetching recipe details:', error.message);
