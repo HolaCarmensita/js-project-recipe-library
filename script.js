@@ -217,6 +217,7 @@ const FILTERS = [
 
 //Generera filter-knappar
 const generateFilterButtons = (aArray) => {
+  console.log('generateFilterButtons körs');
   aArray.forEach((filter) => {
     //Filterknappar utom All-knappen
     const filtersContainerChild = document.createElement('div');
@@ -255,6 +256,7 @@ const generateFilterButtons = (aArray) => {
 
 // Eventlyssnare på hela filtersContainer
 filtersContainer.addEventListener('click', (event) => {
+  console.log('Eventlistner filterknapp körs');
   if (event.target.tagName === 'BUTTON') {
     const clickedButton = event.target;
 
@@ -285,6 +287,7 @@ filtersContainer.addEventListener('click', (event) => {
 
 //generera recipie-cards dynamiskt
 const generateRecipeCards = (ARRAY) => {
+  console.log('generateRecipeCards körs');
   ARRAY.forEach((recipe) => {
     const card = document.createElement('article');
     card.classList.add('recipe-card');
@@ -332,14 +335,13 @@ const presentSelectedFilters = (selectedFilterArray) => {
 
 //Filtrering av filterknappar
 const filterRecipes = () => {
-  recipesContainer.innerHTML = '';
   const selectedFilters = Array.from(
     document.querySelectorAll('.filter-btn.active, .all.active')
   ).map((btn) => btn.textContent.toLowerCase());
 
   presentSelectedFilters(selectedFilters);
 
-  console.log('📌 Valda filter:', selectedFilters);
+  console.log('📌 filterRecipes körs:', selectedFilters);
 
   let filteredRecipes;
   // Om inga filter är valda → Visa alla recept
@@ -379,11 +381,13 @@ const filterRecipes = () => {
 
   // Uppdatera state-variabeln
   visibleRecipes = filteredRecipes;
-  console.log('filteredRecipes:', filteredRecipes);
+  console.log('filteredRecipes resultat:', filteredRecipes);
   return filteredRecipes;
 };
 
 const sortVisibleRecipes = () => {
+  console.log('sortVisibleRecipes körs');
+
   if (visibleRecipes.length === 0) return; // Om inga kort finns, gör ingenting
 
   //Hämta sorteringsval från vår selector
@@ -396,6 +400,8 @@ const sortVisibleRecipes = () => {
     sortedRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes);
   } else if (sortOrder === 'shortest') {
     sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes);
+  } else if (sortOrder === 'none') {
+    // Om 'none' är valt, gör ingen sortering – listan förblir oförändrad
   }
 
   //rensa container och generera nya kort på den sorterade listan
@@ -404,6 +410,8 @@ const sortVisibleRecipes = () => {
 };
 
 const getRandomRecipe = () => {
+  console.log('getRandomRecipe');
+
   if (RECIPES.length === 0) {
     recipesContainer.innerHTML =
       '<p>Hoppsan! Vi hittade inget roligt recept idag...</p>';
@@ -440,9 +448,6 @@ const initApp = () => {
   surpriseButton.addEventListener('click', getRandomRecipe);
 };
 
-//Initiera hela appen när sidan laddas
-document.addEventListener('DOMContentLoaded', initApp);
-
 const updateRecipesUI = () => {
   // Rensa container
   recipesContainer.innerHTML = '';
@@ -455,9 +460,6 @@ const updateRecipesUI = () => {
 
   // Generera receptkort med de filtrerade recepten
   generateRecipeCards(visibleRecipes);
-
-  // Uppdatera sorteringen (om nödvändigt)
-  sortVisibleRecipes();
 };
 
 //Fetch fron ComplexSearch to get recipies with specific Cuisines
@@ -507,4 +509,5 @@ const fetchRecipeDetails = async (recipeIds) => {
   }
 };
 
-fetchRecipes();
+//Initiera hela appen när sidan laddas
+document.addEventListener('DOMContentLoaded', initApp);
