@@ -188,7 +188,7 @@ const RECIPES = [
 const FILTERS = [
   {
     category: 'diets',
-    items: ['Vegan', 'Vegetarian', 'Gluten free', 'Dairy free'],
+    items: ['vegan', 'vegetarian', 'gluten free', 'dairy free'],
   },
   {
     category: 'cuisine',
