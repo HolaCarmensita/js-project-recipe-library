@@ -4,6 +4,7 @@ const sortSelect = document.getElementById('sort-select');
 const surpriseButton = document.getElementById('random-recipe-btn');
 const includedCuisines =
   'italian,mediterranean,middle eastern,asian,mexican,european';
+const includedDiets = ['vegan', 'vegetarian', 'gluten free', 'dairy free'];
 const excludedCuisines = [
   'African',
   'American',
@@ -274,7 +275,17 @@ const generateRecipeCards = (ARRAY) => {
             </div>
             <div class="cuisine">
             <h3>Cuisine:</h3>
-            <p>${recipe.cuisine}</p>
+            <p>${recipe.cuisines
+              .filter((cuisine) =>
+                includedCuisines.includes(cuisine.toLowerCase())
+              )
+              .join(', ')}</p>
+            </div>
+             <div class="Diets">
+            <h3>Diets:</h3>
+            <p>${recipe.diets
+              .filter((diet) => includedDiets.includes(diet.toLowerCase()))
+              .join(', ')}</p>
             </div>
             </div>
                         <hr>
@@ -330,8 +341,13 @@ const filterRecipes = () => {
         allRecipes.some((recipe) => recipe.diets.includes(filter))
       );
 
+      // ÄR DET HÄR VERKLIGEN RÄTT??? Det är ju en lista itirerar jag verkligen?
       const selectedCuisines = selectedFilters.filter((filter) =>
-        allRecipes.some((recipe) => recipe.cuisine.toLowerCase() === filter)
+        allRecipes.some(
+          (recipe) =>
+            recipe.cuisines &&
+            recipe.cuisines.some((cuisine) => cuisine.toLowerCase() === filter)
+        )
       );
 
       // Kontrollera om receptet matchar filtren
@@ -490,7 +506,7 @@ document.addEventListener('DOMContentLoaded', initApp);
 //Fetch fron ComplexSearch with the Bulkfetch from fetchRecipieDetails to get recipies with specific Cuisines
 const fetchRecipes = async () => {
   try {
-    const url = `${searchEndPoint}?apiKey=${API_KEY}&number=10&cuisine=${includedCuisines}`;
+    const url = `${searchEndPoint}?apiKey=${API_KEY}&number=30&cuisine=${includedCuisines}`;
     console.log('Fetching recipes from:', url);
 
     const response = await fetch(url);
