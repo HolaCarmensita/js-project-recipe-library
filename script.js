@@ -276,8 +276,10 @@ filtersContainer.addEventListener('click', (event) => {
       // Toggla active-klassen för en enskild filter-knapp
       clickedButton.classList.toggle('active');
     }
-    // Efter att klasserna ändrats, anropa filterRecipes för att uppdatera receptlistan
-    filterRecipes();
+    // Efter att vi har togglat klasserna, uppdatera state och UI:
+    const recipes = filterRecipes();
+    visibleRecipes = recipes;
+    updateRecipesUI(); // eller generateRecipeCards(sortedRecipes)
   }
 });
 
@@ -328,7 +330,7 @@ const presentSelectedFilters = (selectedFilterArray) => {
     : 'Valda filter: Inga';
 };
 
-//FILTRERING!!!!! AI har hjälpt mig, behöver lära mig detta, gå ingenom varje steg.
+//Filtrering av filterknappar
 const filterRecipes = () => {
   recipesContainer.innerHTML = '';
   const selectedFilters = Array.from(
@@ -359,34 +361,26 @@ const filterRecipes = () => {
         RECIPES.some((recipe) => recipe.cuisine.toLowerCase() === filter)
       );
 
-      //Steg 2: Kolla om receptet matchar filtren
+      // Kontrollera om receptet matchar filtren
       const matchesDiets =
         selectedDiets.length === 0 ||
-        selectedDiets.every((diet) => recipe.diets.includes(diet));
+        selectedDiets.every((diet) =>
+          recipe.diets.map((d) => d.toLowerCase()).includes(diet)
+        );
 
       const matchesCuisine =
         selectedCuisines.length === 0 ||
         selectedCuisines.includes(recipe.cuisine.toLowerCase());
 
       // Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
-      const result = matchesDiets && matchesCuisine;
-      return result;
+      return matchesDiets && matchesCuisine;
     });
-
-    if (!filteredRecipes || filteredRecipes.length === 0) {
-      recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
-      return;
-    }
   }
 
-  console.log('filteredRecipes:', filteredRecipes);
+  // Uppdatera state-variabeln
   visibleRecipes = filteredRecipes;
-
-  // Uppdatera DOM:en med filtrerade recept
-  generateRecipeCards(filteredRecipes);
-
-  //Sortering uppdateras vid ny filtrering
-  sortVisibleRecipes();
+  console.log('filteredRecipes:', filteredRecipes);
+  return filteredRecipes;
 };
 
 const sortVisibleRecipes = () => {
@@ -427,12 +421,18 @@ const getRandomRecipe = () => {
 };
 
 const initApp = () => {
-  //generera filterknappar
+  // Generera filterknappar
   generateFilterButtons(FILTERS);
 
-  //Visar alla recept vid start
-  filterRecipes();
+  // Filtrera – eftersom inga filter är aktiva så returneras alla recept
+  const recipes = filterRecipes();
+  visibleRecipes = recipes;
 
+  // Uppdatera UI med alla recept
+  generateRecipeCards(visibleRecipes);
+
+  // Lägg till eventlyssnare för sortering och andra interaktioner
+  sortSelect.addEventListener('change', updateRecipesUI);
   //Sorteringsknapp
   sortSelect.addEventListener('change', sortVisibleRecipes);
 
@@ -442,6 +442,23 @@ const initApp = () => {
 
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
+
+const updateRecipesUI = () => {
+  // Rensa container
+  recipesContainer.innerHTML = '';
+
+  // Om inga recept finns, visa ett meddelande
+  if (!visibleRecipes || visibleRecipes.length === 0) {
+    recipesContainer.innerHTML = '<p>Inga recept matchar dina filter.</p>';
+    return;
+  }
+
+  // Generera receptkort med de filtrerade recepten
+  generateRecipeCards(visibleRecipes);
+
+  // Uppdatera sorteringen (om nödvändigt)
+  sortVisibleRecipes();
+};
 
 //Fetch fron ComplexSearch to get recipies with specific Cuisines
 const fetchRecipes = async () => {
