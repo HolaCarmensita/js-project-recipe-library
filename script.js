@@ -239,7 +239,7 @@ const generateFilterButtons = (aArray) => {
 
     // Skapar "All"-knappen
     const allButton = document.createElement('button');
-    allButton.classList.add('all');
+    allButton.classList.add('all', 'active');
     allButton.textContent = 'All';
     buttonContainer.appendChild(allButton);
 
@@ -470,27 +470,31 @@ const initApp = async () => {
 
   // Eventlyssnare filtersContainer
   filtersContainer.addEventListener('click', (event) => {
-    if (event.target.tagName === 'BUTTON') {
-      const clickedButton = event.target;
-      // Hantera toggling av "active"-klassen för "all" och individuella filter
-      if (clickedButton.classList.contains('all')) {
-        const filterContainer = clickedButton.parentElement;
-        const filterButtons = filterContainer.querySelectorAll('.filter-btn');
-        if (!clickedButton.classList.contains('active')) {
-          clickedButton.classList.add('active');
-          filterButtons.forEach((btn) => btn.classList.add('active'));
-        } else {
-          clickedButton.classList.remove('active');
-          filterButtons.forEach((btn) => btn.classList.remove('active'));
-        }
+    if (event.target.tagName !== 'BUTTON') return;
+
+    const btn = event.target;
+    const container = btn.parentElement;
+    const allBtn = container.querySelector('.all');
+    const individualBtns = container.querySelectorAll('.filter-btn');
+
+    if (btn.classList.contains('all')) {
+      // Om "all" klickas: om den inte är aktiv, aktivera den och ta bort active från övriga.
+      // Om den är aktiv, ta bort active.
+      if (!btn.classList.contains('active')) {
+        btn.classList.add('active');
+        individualBtns.forEach((b) => b.classList.remove('active'));
       } else {
-        clickedButton.classList.toggle('active');
+        btn.classList.remove('active');
       }
-      // Uppdatera state
-      visibleRecipes = filterRecipes();
-      // Anropa renderingsfunktion
-      renderRecipes();
+    } else {
+      // Om en individuell knapp klickas: toggla den och se till att "all" blir inaktiv.
+      btn.classList.toggle('active');
+      allBtn.classList.remove('active');
     }
+
+    // Uppdatera state och rendera
+    visibleRecipes = filterRecipes();
+    renderRecipes();
   });
 
   sortSelect.addEventListener('change', () => {
@@ -529,7 +533,7 @@ const fetchRecipes = async () => {
   }
 };
 
-//Need to fetch again to get ingridiets... with bulk, dont find any other way....
+//Need to fetch to get ingridiets... with bulk, dont find any other way....
 const fetchRecipeDetails = async (recipeIds) => {
   try {
     const url = `${bulkEndPoint}?apiKey=${API_KEY}&ids=${recipeIds}`;
@@ -548,8 +552,6 @@ const fetchRecipeDetails = async (recipeIds) => {
     return [];
   }
 };
-
-fetchRecipes();
 
 //Initiera hela appen när sidan laddas
 document.addEventListener('DOMContentLoaded', initApp);
