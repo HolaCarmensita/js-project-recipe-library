@@ -44,11 +44,22 @@ body {
 }
 
 .wrapper {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto; /* Centrerar innehållet horisontellt */
   padding: 20px;
 }
 
+.sort-select-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.sort-randome-conatiner {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  padding: 40px 0px;
+}
 header {
   padding: 30px 0px 30px 0px;
 }
@@ -72,6 +83,12 @@ ul {
   gap: 24px;
 }
 
+.filter-container-child {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .filter-card {
   display: flex;
   flex-direction: column;
@@ -87,6 +104,11 @@ ul {
   gap: 10px;
 }
 
+#random-recipe-btn {
+  background-color: var(--button-color-magenta);
+  color: var(--text-color-blue);
+}
+
 button {
   cursor: pointer;
   width: fit-content;
@@ -96,6 +118,14 @@ button {
   border-radius: 50px;
   border: 2px solid transparent;
   text-transform: capitalize;
+}
+
+.filter-diets button:hover,
+.filter-cooking-time button:hover,
+.filter-cuisine button:hover,
+#random-recipe-btn:hover {
+  border-radius: 50px;
+  border: 2px solid #0018a4;
 }
 
 .filter-diets button,
@@ -131,6 +161,7 @@ button {
 }
 
 .recipe-card {
+  cursor: pointer;
   display: flex;
   width: 300px;
   padding: 16px 16px 24px 16px;
@@ -138,6 +169,11 @@ button {
   align-items: flex-start;
   gap: 16px;
 
+  border-radius: 16px;
+  border: 2px solid #0018a4;
+}
+
+.recipe-card:hover {
   border-radius: 16px;
   border: 2px solid #0018a4;
   background: #fff;
@@ -153,10 +189,11 @@ hr {
 
 /* IMG behöver göras om för att bli responsiv, vi tar det senare när vi har bilder */
 .img-container {
-  width: 250px;
   height: 200px;
+  align-self: stretch;
   background-color: #000;
   overflow: hidden;
+  border-radius: 12px;
 }
 
 img {
@@ -166,13 +203,6 @@ img {
 .time-and-cuisine {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.time,
-.cuisine {
-  display: flex;
-  align-items: center;
   gap: 8px;
 }
 
@@ -190,10 +220,39 @@ img {
 
 @media (min-width: 768px) {
   .filters-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .wrapper {
+    padding: 20px;
+  }
+
+  .recipes-container {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+    align-items: start;
+  }
+
+  .recipe-card {
+    justify-self: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .recipes-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1300px) {
+  .filters-container {
     flex-direction: row;
   }
 
   .recipes-container {
-    flex-direction: row;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
