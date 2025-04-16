@@ -34,156 +34,6 @@ const API_KEY = '11dcc7d2bf36478dae1c29d5a48bbc42';
 
 let visibleRecipes = [];
 let allRecipes = [];
-const RECIPES = [
-  {
-    id: 1,
-    title: 'Vegan Lentil Soup',
-    image: './chicken.webp',
-    readyInMinutes: 30,
-    servings: 4,
-    sourceUrl: 'https://example.com/vegan-lentil-soup',
-    diets: ['vegan'],
-    cuisine: 'Mediterranean',
-    ingredients: [
-      'red lentils',
-      'carrots',
-      'onion',
-      'garlic',
-      'tomato paste',
-      'cumin',
-      'paprika',
-      'vegetable broth',
-      'olive oil',
-      'salt',
-    ],
-    pricePerServing: 2.5,
-    popularity: 85,
-  },
-  {
-    id: 2,
-    title: 'Vegetarian Pesto Pasta',
-    image: './chicken.webp',
-    readyInMinutes: 25,
-    servings: 2,
-    sourceUrl: 'https://example.com/vegetarian-pesto-pasta',
-    diets: ['vegetarian'],
-    cuisine: 'Italian',
-    ingredients: [
-      'pasta',
-      'basil',
-      'parmesan cheese',
-      'garlic',
-      'pine nuts',
-      'olive oil',
-      'salt',
-      'black pepper',
-    ],
-    pricePerServing: 3.0,
-    popularity: 92,
-  },
-  {
-    id: 3,
-    title: 'Gluten-Free Chicken Stir-Fry',
-    image: './chicken.webp',
-    readyInMinutes: 20,
-    servings: 3,
-    sourceUrl: 'https://example.com/gluten-free-chicken-stir-fry',
-    diets: ['gluten-free'],
-    cuisine: 'Asian',
-    ingredients: [
-      'chicken breast',
-      'broccoli',
-      'bell pepper',
-      'carrot',
-      'soy sauce (gluten-free)',
-      'ginger',
-      'garlic',
-      'sesame oil',
-      'cornstarch',
-      'green onion',
-      'sesame seeds',
-      'rice',
-    ],
-    pricePerServing: 4.0,
-    popularity: 78,
-  },
-  {
-    id: 4,
-    title: 'Dairy-Free Tacos',
-    image: './chicken.webp',
-    readyInMinutes: 15,
-    servings: 2,
-    sourceUrl: 'https://example.com/dairy-free-tacos',
-    diets: ['dairy-free'],
-    cuisine: 'Mexican',
-    ingredients: [
-      'corn tortillas',
-      'ground beef',
-      'taco seasoning',
-      'lettuce',
-      'tomato',
-      'avocado',
-    ],
-    pricePerServing: 2.8,
-    popularity: 88,
-  },
-  {
-    id: 5,
-    title: 'Middle Eastern Hummus',
-    image: './chicken.webp',
-    readyInMinutes: 10,
-    servings: 4,
-    sourceUrl: 'https://example.com/middle-eastern-hummus',
-    diets: ['vegan', 'gluten-free'],
-    cuisine: 'Middle Eastern',
-    ingredients: ['chickpeas', 'tahini', 'garlic', 'lemon juice', 'olive oil'],
-    pricePerServing: 1.5,
-    popularity: 95,
-  },
-  {
-    id: 6,
-    title: 'Quick Avocado Toast',
-    image: './chicken.webp',
-    readyInMinutes: 5,
-    servings: 1,
-    sourceUrl: 'https://example.com/quick-avocado-toast',
-    diets: ['vegan'],
-    cuisine: 'Mediterranean',
-    ingredients: ['bread', 'avocado', 'lemon juice', 'salt'],
-    pricePerServing: 2.0,
-    popularity: 90,
-  },
-  {
-    id: 7,
-    title: 'Beef Stew',
-    image: './chicken.webp',
-    readyInMinutes: 90,
-    servings: 5,
-    sourceUrl: 'https://example.com/beef-stew',
-    diets: [],
-    cuisine: 'European',
-    ingredients: [
-      'beef chunks',
-      'potatoes',
-      'carrots',
-      'onion',
-      'garlic',
-      'tomato paste',
-      'beef broth',
-      'red wine',
-      'bay leaves',
-      'thyme',
-      'salt',
-      'black pepper',
-      'butter',
-      'flour',
-      'celery',
-      'mushrooms',
-    ],
-    pricePerServing: 5.5,
-    popularity: 80,
-  },
-];
 
 const FILTERS = [
   {
@@ -315,7 +165,6 @@ const presentSelectedFilters = (selectedFilterArray) => {
     : 'Valda filter: Inga';
 };
 
-//Filtrering av filterknappar
 const filterRecipes = () => {
   const selectedFilters = Array.from(
     document.querySelectorAll('.filter-btn.active, .all.active')
@@ -323,49 +172,39 @@ const filterRecipes = () => {
 
   presentSelectedFilters(selectedFilters);
 
-  let filteredRecipes;
-  // Om inga filter är valda → Visa alla recept
-  if (selectedFilters.length === 0) {
-    filteredRecipes = [...allRecipes];
-  } else {
-    filteredRecipes = [...allRecipes].filter((recipe) => {
-      // Om "all" är valt returnera alla recept
-      if (selectedFilters.includes('all')) {
-        return true;
-      }
+  // Ta bort "all" från de aktiva filtren, då vi hanterar varje kategori separat.
+  const selectedFiltersWithoutAll = selectedFilters.filter(
+    (filter) => filter !== 'all'
+  );
 
-      // Skapa listor med de valda dieterna respektive cuisines, baserat på våra referenslistor
-      const selectedDiets = selectedFilters.filter((filter) =>
-        includedDiets.includes(filter)
-      );
-      const selectedCuisines = selectedFilters.filter((filter) =>
-        includedCuisines.includes(filter)
-      );
+  // Dela upp filtren i dieter respektive cuisines
+  const selectedDiets = selectedFiltersWithoutAll.filter((filter) =>
+    includedDiets.includes(filter)
+  );
+  const selectedCuisines = selectedFiltersWithoutAll.filter((filter) =>
+    includedCuisines.includes(filter)
+  );
 
-      // Om receptet har en 'diets'-lista: omvandla alla värden till gemener
-      const recipeDiets = recipe.diets.map((diet) => diet.toLowerCase());
-      // Om receptet har en 'cuisines'-lista: omvandla alla värden till gemener
-      const recipeCuisines = recipe.cuisines.map((cuisine) =>
-        cuisine.toLowerCase()
-      );
+  let filteredRecipes = allRecipes.filter((recipe) => {
+    const recipeDiets = recipe.diets.map((diet) => diet.toLowerCase());
+    const recipeCuisines = recipe.cuisines.map((cuisine) =>
+      cuisine.toLowerCase()
+    );
 
-      // Kontrollera om receptet matchar filtren
-      const matchesDiets =
-        selectedDiets.length === 0 ||
-        selectedDiets.every((diet) =>
-          recipeDiets.map((d) => d.toLowerCase()).includes(diet)
-        );
+    // Om inga dietfilter är specifika så ska receptet accepteras vad gäller dieter
+    const matchesDiets =
+      selectedDiets.length === 0 ||
+      selectedDiets.every((diet) => recipeDiets.includes(diet));
 
-      const matchesCuisine =
-        selectedCuisines.length === 0 ||
-        selectedCuisines.includes(recipeCuisines.toLowerCase());
+    // Om inga cuisinefilter är specifika så ska receptet accepteras vad gäller cuisine
+    const matchesCuisines =
+      selectedCuisines.length === 0 ||
+      recipeCuisines.some((cuisine) => selectedCuisines.includes(cuisine));
 
-      // Steg 3: Returnera resultatet - receptet måste matcha båda kategorierna
-      return matchesDiets && matchesCuisine;
-    });
-  }
+    // Receptet visas endast om det matchar båda kategorierna
+    return matchesDiets && matchesCuisines;
+  });
 
-  // Uppdatera state-variabeln
   visibleRecipes = filteredRecipes;
   console.log('filteredRecipes resultat:', filteredRecipes);
   return filteredRecipes;
