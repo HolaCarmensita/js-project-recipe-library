@@ -1,3 +1,3 @@
 # js-project-recipe-library
 
-https://carmencitas-recipe-library.netlify.app/
+https://app.netlify.com/sites/recipe-library-technigo/overview
