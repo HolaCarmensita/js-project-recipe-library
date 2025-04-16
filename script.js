@@ -108,9 +108,11 @@ const generateFilterButtons = (aArray) => {
 //generera recipie-cards dynamiskt
 const generateRecipeCards = (ARRAY) => {
   console.log('generateRecipeCards körs');
-  ARRAY.forEach((recipe) => {
+  ARRAY.forEach((recipe, index) => {
     const card = document.createElement('article');
     card.classList.add('recipe-card');
+
+    card.style.animationDelay = `${index * 100}ms`;
 
     card.innerHTML = `
     <div class="img-container">
@@ -163,6 +165,13 @@ const presentSelectedFilters = (selectedFilterArray) => {
   filterValueContainer.textContent = filteredArray.length
     ? `Valda filter: ${filteredArray.join(', ')}`
     : 'Valda filter: Inga';
+};
+
+const updateMatchCount = () => {
+  const matchCountElement = document.getElementById('match-count');
+  if (matchCountElement) {
+    matchCountElement.textContent = `${visibleRecipes.length} recept matchar dina filter.`;
+  }
 };
 
 const filterRecipes = () => {
@@ -283,6 +292,8 @@ const renderRecipes = () => {
 
   // Rensa containern
   recipesContainer.innerHTML = '';
+
+  updateMatchCount();
 
   // Rendera recepten eller visa ett meddelande om listan är tom
   if (recipesToRender.length === 0) {

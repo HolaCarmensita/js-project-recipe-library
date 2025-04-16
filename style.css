@@ -73,10 +73,6 @@ ul {
   font-size: 40px;
 }
 
-.recipe-card {
-  border: #000 solid 1px;
-}
-
 .filters-container {
   display: flex;
   flex-direction: column;
@@ -160,7 +156,19 @@ button {
   align-items: center;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .recipe-card {
+  animation: fadeIn 0.5s ease-out;
   cursor: pointer;
   display: flex;
   width: 300px;
